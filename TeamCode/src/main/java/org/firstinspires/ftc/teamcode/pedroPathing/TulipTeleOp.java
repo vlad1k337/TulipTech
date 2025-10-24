@@ -48,6 +48,12 @@ public class TulipTeleOp extends OpMode {
                 .build();
     }
 
+    public void initShooters()
+    {
+        launchR = hardwareMap.get(DcMotor.class, "launch R");
+        launchL = hardwareMap.get(DcMotor.class, "launch L");
+    }
+
     @Override
     public void init()
     {
@@ -56,12 +62,12 @@ public class TulipTeleOp extends OpMode {
         startingPose = new Pose(0, 0);
         follower.setStartingPose(startingPose);
         follower.update();
-        initAprilTag();
 
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 
-        launchR = hardwareMap.get(DcMotor.class, "launch R");
-        launchL = hardwareMap.get(DcMotor.class, "launch L");
+
+        initAprilTag();
+        initShooters();
 
         pathChain = () -> follower.pathBuilder()
                 .addPath(new Path(new BezierLine(follower::getPose, new Pose(72, 72))))
@@ -76,7 +82,7 @@ public class TulipTeleOp extends OpMode {
         follower.update();
     }
 
-    public void update_shooters()
+    public void updateShooters()
     {
         if(gamepad1.xWasPressed())
         {
@@ -102,6 +108,19 @@ public class TulipTeleOp extends OpMode {
         launchL.setPower(launchSpeedLeft);
     }
 
+    public void updateCamera()
+    {
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        for(AprilTagDetection detection : currentDetections)
+        {
+            if(detection.metadata != null)
+            {
+                telemetryM.debug("Tag Name: " + detection.metadata.name);
+                telemetryM.debug("Tag Pose (x, y, z): " + detection.ftcPose.x + ", " + detection.ftcPose.y + ", " + detection.ftcPose.z);
+            }
+        }
+    }
+
     @Override
     public void loop()
     {
@@ -114,17 +133,9 @@ public class TulipTeleOp extends OpMode {
                 true
         );
 
-        update_shooters();
+        updateShooters();
 
-        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-        for(AprilTagDetection detection : currentDetections)
-        {
-            if(detection.metadata != null)
-            {
-                telemetryM.debug("Tag Name: " + detection.metadata.name);
-                telemetryM.debug("Tag Pose (x, y, z): " + detection.ftcPose.x + ", " + detection.ftcPose.y + ", " + detection.ftcPose.z);
-            }
-        }
+        updateCamera();
 
         telemetryM.debug("x:" + follower.getPose().getX());
         telemetryM.debug("y:" + follower.getPose().getY());
