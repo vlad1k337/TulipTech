@@ -34,11 +34,14 @@ public class TulipTeleOp extends OpMode {
     private VisionPortal visionPortal;
     private AprilTagProcessor aprilTag;
 
-    private double launchSpeedRight = 0.0;
-    private double launchSpeedLeft  = 0.0;
+    private double launchSpeed = 0.0;
 
-    public void initAprilTag()
-    {
+    final double middlePower = 0.50;
+    final double backPower   = 0.75;
+    final double topPower    = 0.55;
+    final double boxPower    = 0.30;
+
+    public void initAprilTag() {
         aprilTag = new AprilTagProcessor.Builder().build();
         aprilTag.setDecimation(2);
 
@@ -48,15 +51,13 @@ public class TulipTeleOp extends OpMode {
                 .build();
     }
 
-    public void initShooters()
-    {
+    public void initShooters() {
         launchR = hardwareMap.get(DcMotor.class, "launch R");
         launchL = hardwareMap.get(DcMotor.class, "launch L");
     }
 
     @Override
-    public void init()
-    {
+    public void init() {
         follower = Constants.createFollower(hardwareMap);
 
         startingPose = new Pose(0, 0);
@@ -65,8 +66,8 @@ public class TulipTeleOp extends OpMode {
 
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 
-
         initAprilTag();
+
         initShooters();
 
         pathChain = () -> follower.pathBuilder()
@@ -76,39 +77,62 @@ public class TulipTeleOp extends OpMode {
     }
 
     @Override
-    public void start()
-    {
+    public void start() {
         follower.startTeleopDrive();
         follower.update();
     }
 
-    public void updateShooters()
+    private void updateGamepad()
+    {
+        follower.update();
+
+        follower.setTeleOpDrive(
+                -gamepad1.left_stick_y,
+                -gamepad1.left_stick_x,
+                -gamepad1.right_stick_x,
+                true
+        );
+    }
+
+    private void updateShooters()
     {
         if(gamepad1.xWasPressed())
         {
-            launchSpeedLeft  = 0.5;
-            launchSpeedRight = 0.5;
+            launchSpeed  = 0.5;
         } else if(gamepad1.yWasPressed()) {
-            launchSpeedLeft  = 0.0;
-            launchSpeedRight = 0.0;
+            launchSpeed  = 0.0;
+        }
+
+        String shootingMode = "NOT SET";
+        if(gamepad1.dpadUpWasPressed())
+        {
+            launchSpeed  = middlePower;
+            shootingMode = "middle";
+        } else if(gamepad1.dpadDownWasPressed()) {
+            launchSpeed  = backPower;
+            shootingMode = "Back";
+        } else if(gamepad1.dpadRightWasPressed()) {
+            launchSpeed  = topPower;
+            shootingMode = "Top";
+        } else if(gamepad1.dpadLeftWasPressed()) {
+            launchSpeed  = boxPower;
+            shootingMode = "Box";
         }
 
         if(gamepad1.leftBumperWasPressed()) {
-            if (launchSpeedLeft - 0.1 > 0.0) launchSpeedLeft -= 0.1;
-            if (launchSpeedRight - 0.1 > 0.0) launchSpeedRight -= 0.1;
+            if (launchSpeed - 0.1 > 0.0) launchSpeed -= 0.1;
         } else if(gamepad1.rightBumperWasPressed()) {
-            if(launchSpeedLeft  + 0.1 < 1.0) launchSpeedLeft  += 0.1;
-            if(launchSpeedRight + 0.1 < 1.0) launchSpeedRight += 0.1;
+            if(launchSpeed + 0.1 < 1.0) launchSpeed += 0.1;
         }
 
-        telemetryM.debug("Left Shooter power: " + launchSpeedLeft);
-        telemetryM.debug("Right Shooter power: " + launchSpeedRight);
+        telemetryM.debug("Shooter Power: " + launchSpeed);
+        telemetryM.debug("Shooter Mode:  " + shootingMode);
 
-        launchR.setPower(-launchSpeedRight);
-        launchL.setPower(launchSpeedLeft);
+        launchR.setPower(-launchSpeed);
+        launchL.setPower(launchSpeed);
     }
 
-    public void updateCamera()
+    private void updateCamera()
     {
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         for(AprilTagDetection detection : currentDetections)
@@ -121,27 +145,24 @@ public class TulipTeleOp extends OpMode {
         }
     }
 
-    @Override
-    public void loop()
+    private void updateTelemetry()
     {
-        follower.update();
-
-        follower.setTeleOpDrive(
-                -gamepad1.left_stick_y,
-                -gamepad1.left_stick_x,
-                -gamepad1.right_stick_x,
-                true
-        );
-
-        updateShooters();
-
-        updateCamera();
-
         telemetryM.debug("x:" + follower.getPose().getX());
         telemetryM.debug("y:" + follower.getPose().getY());
         telemetryM.debug("heading:" + follower.getPose().getHeading());
 
         telemetryM.update(telemetry);
+    }
 
+    @Override
+    public void loop()
+    {
+        updateGamepad();
+
+        updateShooters();
+
+        updateCamera();
+
+        updateTelemetry();
     }
 }
