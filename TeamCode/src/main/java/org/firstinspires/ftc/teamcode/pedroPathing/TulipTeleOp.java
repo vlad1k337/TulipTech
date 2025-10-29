@@ -52,8 +52,8 @@ public class TulipTeleOp extends OpMode {
     }
 
     public void initShooters() {
-        //launchR = hardwareMap.get(DcMotor.class, "launch R");
-        //launchL = hardwareMap.get(DcMotor.class, "launch L");
+        launchR = hardwareMap.get(DcMotor.class, "launchR");
+        launchL = hardwareMap.get(DcMotor.class, "launchL");
     }
 
     @Override
