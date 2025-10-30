@@ -10,6 +10,7 @@ import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -26,6 +27,8 @@ public class TulipTeleOp extends OpMode {
     private Supplier<PathChain> pathChain;
     private DcMotor launchR, launchL;
 
+    private CRServo beltServo, leftIn, rightIn;
+
     private Follower follower;
     private TelemetryManager telemetryM;
 
@@ -34,6 +37,7 @@ public class TulipTeleOp extends OpMode {
     private VisionPortal visionPortal;
     private AprilTagProcessor aprilTag;
 
+    private String shootingMode = "NOT SET";
     private double launchSpeed = 0.0;
 
     final double middlePower = 0.50;
@@ -56,6 +60,13 @@ public class TulipTeleOp extends OpMode {
         launchL = hardwareMap.get(DcMotor.class, "launchL");
     }
 
+    public void initIntake()
+    {
+        beltServo = hardwareMap.get(CRServo.class, "beltServo");
+        leftIn    = hardwareMap.get(CRServo.class, "leftIn");
+        rightIn   = hardwareMap.get(CRServo.class, "rightIn");
+    }
+
     @Override
     public void init() {
         follower = Constants.createFollower(hardwareMap);
@@ -69,6 +80,8 @@ public class TulipTeleOp extends OpMode {
         initAprilTag();
 
         initShooters();
+
+        initIntake();
 
         pathChain = () -> follower.pathBuilder()
                 .addPath(new Path(new BezierLine(follower::getPose, new Pose(72, 72))))
@@ -101,22 +114,22 @@ public class TulipTeleOp extends OpMode {
             launchSpeed  = 0.5;
         } else if(gamepad1.yWasPressed()) {
             launchSpeed  = 0.0;
+            shootingMode = "NOT SET";
         }
 
-        String shootingMode = "NOT SET";
         if(gamepad1.dpadUpWasPressed())
         {
             launchSpeed  = middlePower;
-            shootingMode = "middle";
+            shootingMode = "MIDDLE";
         } else if(gamepad1.dpadDownWasPressed()) {
             launchSpeed  = backPower;
-            shootingMode = "Back";
+            shootingMode = "BACK";
         } else if(gamepad1.dpadRightWasPressed()) {
             launchSpeed  = topPower;
-            shootingMode = "Top";
+            shootingMode = "TOP";
         } else if(gamepad1.dpadLeftWasPressed()) {
             launchSpeed  = boxPower;
-            shootingMode = "Box";
+            shootingMode = "BOX";
         }
 
         if(gamepad1.leftBumperWasPressed()) {
@@ -125,11 +138,11 @@ public class TulipTeleOp extends OpMode {
             if(launchSpeed + 0.1 < 1.0) launchSpeed += 0.1;
         }
 
+        launchR.setPower(-launchSpeed);
+        launchL.setPower(-launchSpeed);
+
         telemetryM.debug("Shooter Power: " + launchSpeed);
         telemetryM.debug("Shooter Mode:  " + shootingMode);
-
-        launchR.setPower(-launchSpeed);
-        launchL.setPower(launchSpeed);
     }
 
     private void updateCamera()
@@ -142,6 +155,22 @@ public class TulipTeleOp extends OpMode {
                 telemetryM.debug("Tag Name: " + detection.metadata.name);
                 telemetryM.debug("Tag Pose (x, y, z): " + detection.ftcPose.x + ", " + detection.ftcPose.y + ", " + detection.ftcPose.z);
             }
+        }
+    }
+
+    private void updateIntake()
+    {
+        if(gamepad1.aWasPressed())
+        {
+            beltServo.setPower(-1.0);
+
+            rightIn.setPower(-1.0);
+            leftIn.setPower(1.0);
+        } else if(gamepad1.bWasPressed()) {
+            beltServo.setPower(0.0);
+
+            rightIn.setPower(0.0);
+            leftIn.setPower(0.0);
         }
     }
 
@@ -160,6 +189,8 @@ public class TulipTeleOp extends OpMode {
         updateGamepad();
 
         updateShooters();
+
+        updateIntake();
 
         updateCamera();
 
