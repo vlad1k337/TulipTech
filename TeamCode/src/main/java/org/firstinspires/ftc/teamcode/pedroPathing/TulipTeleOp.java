@@ -77,8 +77,6 @@ public class TulipTeleOp extends OpMode {
 
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 
-        initAprilTag();
-
         initShooters();
 
         initIntake();
@@ -191,8 +189,6 @@ public class TulipTeleOp extends OpMode {
         updateShooters();
 
         updateIntake();
-
-        updateCamera();
 
         updateTelemetry();
     }
