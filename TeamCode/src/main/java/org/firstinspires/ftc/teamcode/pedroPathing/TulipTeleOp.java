@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -27,7 +28,9 @@ public class TulipTeleOp extends OpMode {
     private Supplier<PathChain> pathChain;
     private DcMotor launchR, launchL;
 
-    private CRServo beltServo, leftIn, rightIn;
+    private DcMotor belt;
+    private Servo gate;
+    private CRServo leftIn, rightIn;
 
     private Follower follower;
     private TelemetryManager telemetryM;
@@ -62,9 +65,11 @@ public class TulipTeleOp extends OpMode {
 
     public void initIntake()
     {
-        beltServo = hardwareMap.get(CRServo.class, "beltServo");
-        leftIn    = hardwareMap.get(CRServo.class, "leftIn");
-        rightIn   = hardwareMap.get(CRServo.class, "rightIn");
+        belt    = hardwareMap.get(DcMotor.class, "Belt");
+        leftIn  = hardwareMap.get(CRServo.class, "leftIn");
+        rightIn = hardwareMap.get(CRServo.class, "rightIn");
+
+        gate = hardwareMap.get(Servo.class, "Gate");
     }
 
     @Override
@@ -80,11 +85,6 @@ public class TulipTeleOp extends OpMode {
         initShooters();
 
         initIntake();
-
-        pathChain = () -> follower.pathBuilder()
-                .addPath(new Path(new BezierLine(follower::getPose, new Pose(72, 72))))
-                .setConstantHeadingInterpolation(45.0)
-                .build();
     }
 
     @Override
@@ -136,7 +136,14 @@ public class TulipTeleOp extends OpMode {
             if(launchSpeed + 0.1 < 1.0) launchSpeed += 0.1;
         }
 
-        launchR.setPower(-launchSpeed);
+        if(gamepad1.right_trigger > 0.0)
+        {
+            gate.setPosition(0.1);
+        } else if(gamepad1.left_trigger > 0.0) {
+            gate.setPosition(0.0);
+        }
+
+        launchR.setPower(launchSpeed);
         launchL.setPower(-launchSpeed);
 
         telemetryM.debug("Shooter Power: " + launchSpeed);
@@ -160,12 +167,12 @@ public class TulipTeleOp extends OpMode {
     {
         if(gamepad1.aWasPressed())
         {
-            beltServo.setPower(-1.0);
+            belt.setPower(0.6);
 
             rightIn.setPower(-1.0);
             leftIn.setPower(1.0);
         } else if(gamepad1.bWasPressed()) {
-            beltServo.setPower(0.0);
+            belt.setPower(0.0);
 
             rightIn.setPower(0.0);
             leftIn.setPower(0.0);
