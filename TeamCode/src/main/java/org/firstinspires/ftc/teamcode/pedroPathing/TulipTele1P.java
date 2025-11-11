@@ -4,13 +4,9 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
-import com.pedropathing.paths.Path;
-import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -20,17 +16,14 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
-import java.util.function.Supplier;
 
 @Configurable
 @TeleOp
-public class TulipTeleOp extends OpMode {
-    private Supplier<PathChain> pathChain;
+public class TulipTele1P extends OpMode {
     private DcMotor launchR, launchL;
 
-    private DcMotor belt;
+    private DcMotor belt, intake;
     private Servo gate;
-    private CRServo leftIn, rightIn;
 
     private Follower follower;
     private TelemetryManager telemetryM;
@@ -40,13 +33,15 @@ public class TulipTeleOp extends OpMode {
     private VisionPortal visionPortal;
     private AprilTagProcessor aprilTag;
 
-    private String shootingMode = "NOT SET";
-    private double launchSpeed = 0.0;
+    private String  shootingMode = "NOT SET";
+    private double  launchSpeed = 0.0;
 
-    final double middlePower = 0.50;
     final double backPower   = 0.75;
     final double topPower    = 0.55;
-    final double boxPower    = 0.30;
+    final double middlePower = 0.50;
+    final double boxPower    = 0.40;
+
+    final double beltSpeed = 0.75;
 
     public void initAprilTag() {
         aprilTag = new AprilTagProcessor.Builder().build();
@@ -66,8 +61,7 @@ public class TulipTeleOp extends OpMode {
     public void initIntake()
     {
         belt    = hardwareMap.get(DcMotor.class, "Belt");
-        leftIn  = hardwareMap.get(CRServo.class, "leftIn");
-        rightIn = hardwareMap.get(CRServo.class, "rightIn");
+        intake  = hardwareMap.get(DcMotor.class, "Intake");
 
         gate = hardwareMap.get(Servo.class, "Gate");
     }
@@ -76,7 +70,7 @@ public class TulipTeleOp extends OpMode {
     public void init() {
         follower = Constants.createFollower(hardwareMap);
 
-        startingPose = new Pose(0, 0);
+        startingPose = new Pose(10, 20);
         follower.setStartingPose(startingPose);
         follower.update();
 
@@ -107,24 +101,27 @@ public class TulipTeleOp extends OpMode {
 
     private void updateShooters()
     {
-        if(gamepad1.xWasPressed())
-        {
-            launchSpeed  = 0.5;
-        } else if(gamepad1.yWasPressed()) {
+        if(gamepad1.yWasPressed()) {
             launchSpeed  = 0.0;
             shootingMode = "NOT SET";
         }
 
+        if(gamepad1.rightStickButtonWasPressed())
+        {
+            launchSpeed = 0.35;
+            belt.setPower(-beltSpeed);
+        }
+
         if(gamepad1.dpadUpWasPressed())
         {
-            launchSpeed  = middlePower;
-            shootingMode = "MIDDLE";
-        } else if(gamepad1.dpadDownWasPressed()) {
             launchSpeed  = backPower;
             shootingMode = "BACK";
         } else if(gamepad1.dpadRightWasPressed()) {
             launchSpeed  = topPower;
             shootingMode = "TOP";
+        } else if(gamepad1.dpadDownWasPressed()) {
+            launchSpeed  = middlePower;
+            shootingMode = "MIDDLE";
         } else if(gamepad1.dpadLeftWasPressed()) {
             launchSpeed  = boxPower;
             shootingMode = "BOX";
@@ -143,7 +140,7 @@ public class TulipTeleOp extends OpMode {
             gate.setPosition(0.0);
         }
 
-        launchR.setPower(launchSpeed);
+        launchR.setPower(-launchSpeed);
         launchL.setPower(-launchSpeed);
 
         telemetryM.debug("Shooter Power: " + launchSpeed);
@@ -167,15 +164,11 @@ public class TulipTeleOp extends OpMode {
     {
         if(gamepad1.aWasPressed())
         {
-            belt.setPower(0.6);
-
-            rightIn.setPower(-1.0);
-            leftIn.setPower(1.0);
+            belt.setPower(beltSpeed);
+            intake.setPower(-1.0);
         } else if(gamepad1.bWasPressed()) {
             belt.setPower(0.0);
-
-            rightIn.setPower(0.0);
-            leftIn.setPower(0.0);
+            intake.setPower(0.0);
         }
     }
 

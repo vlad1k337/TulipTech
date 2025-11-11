@@ -7,20 +7,25 @@ import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-@Autonomous(name = "TulipAuto")
-public class TulipAuto extends OpMode {
+@Autonomous(name = "TulipScoreAuto")
+public class TulipScoreAuto extends OpMode {
     private Follower follower;
 
     private enum pathState {
         STATE_STARTED,
         STATE_CENTER,
         STATE_REST,
-    };
+    }
 
     private pathState currentState = pathState.STATE_STARTED;
 
-    private final Pose startPose  = new Pose(0, 0, Math.toRadians(0));
-    private final Pose centerPose = new Pose(72, 72, Math.toRadians(0));
+    private Pose centerPose = new Pose(72, 72, Math.toRadians(90));
+
+    private final Pose startPose = new Pose(108, 132, Math.toRadians(270));
+
+    final Pose PPG = new Pose(96, 83.5, Math.toRadians(0));
+    final Pose PGP = new Pose(96, 59.5, Math.toRadians(0));
+    final Pose GPP = new Pose(96, 35.5, Math.toRadians(0));
 
     private PathChain moveToCenter;
 
@@ -54,6 +59,8 @@ public class TulipAuto extends OpMode {
     @Override
     public void init()
     {
+        centerPose = PPG;
+
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);
 
