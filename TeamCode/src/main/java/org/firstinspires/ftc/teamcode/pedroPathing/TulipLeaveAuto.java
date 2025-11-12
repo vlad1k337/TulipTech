@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 @Autonomous(name = "TulipLeaveAuto")
 public class TulipLeaveAuto extends OpMode {
+
     private Follower follower;
 
     private enum pathState {

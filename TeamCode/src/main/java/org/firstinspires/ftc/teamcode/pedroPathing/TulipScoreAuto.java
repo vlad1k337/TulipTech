@@ -6,9 +6,16 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+
+import org.firstinspires.ftc.teamcode.pedroPathing.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.pedroPathing.subsystems.Shooter;
 
 @Autonomous(name = "TulipScoreAuto")
 public class TulipScoreAuto extends OpMode {
+    private Shooter shooter;
+    private Intake intake;
+
     private Follower follower;
 
     private enum pathState {
@@ -19,9 +26,8 @@ public class TulipScoreAuto extends OpMode {
 
     private pathState currentState = pathState.STATE_STARTED;
 
-    private Pose centerPose = new Pose(72, 72, Math.toRadians(90));
-
     private final Pose startPose = new Pose(108, 132, Math.toRadians(270));
+    private       Pose centerPose = new Pose(72, 72, Math.toRadians(90));
 
     final Pose PPG = new Pose(96, 83.5, Math.toRadians(0));
     final Pose PGP = new Pose(96, 59.5, Math.toRadians(0));
@@ -29,7 +35,32 @@ public class TulipScoreAuto extends OpMode {
 
     private PathChain moveToCenter;
 
-    public void buildPath()
+    @Override
+    public void init()
+    {
+        centerPose = PPG;
+
+        follower = Constants.createFollower(hardwareMap);
+        follower.setStartingPose(startPose);
+
+        buildPaths();
+    }
+
+    @Override
+    public void loop()
+    {
+        follower.update();
+
+        autonomousPathUpdate();
+
+        telemetry.addData("path state", currentState);
+        telemetry.addData("x", follower.getPose().getX());
+        telemetry.addData("y", follower.getPose().getY());
+        telemetry.addData("heading", follower.getPose().getHeading());
+        telemetry.update();
+    }
+
+    public void buildPaths()
     {
         moveToCenter = follower.pathBuilder()
                 .addPath(new BezierLine(startPose, centerPose))
@@ -37,9 +68,8 @@ public class TulipScoreAuto extends OpMode {
                 .build();
     }
 
-    public void autonomousPathUpdate()
-    {
-        switch(currentState) {
+    public void autonomousPathUpdate() {
+        switch (currentState) {
             case STATE_STARTED:
                 follower.followPath(moveToCenter, true);
                 currentState = pathState.STATE_CENTER;
@@ -54,31 +84,5 @@ public class TulipScoreAuto extends OpMode {
             case STATE_REST:
                 break;
         }
-    }
-
-    @Override
-    public void init()
-    {
-        centerPose = PPG;
-
-        follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(startPose);
-
-        buildPath();
-    }
-
-
-    @Override
-    public void loop()
-    {
-        follower.update();
-
-        autonomousPathUpdate();
-
-        telemetry.addData("path state", currentState);
-        telemetry.addData("x", follower.getPose().getX());
-        telemetry.addData("y", follower.getPose().getY());
-        telemetry.addData("heading", follower.getPose().getHeading());
-        telemetry.update();
     }
 }
