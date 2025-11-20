@@ -15,12 +15,11 @@ public class Shooter {
     private Servo gate;
 
     private String shootingMode = "NOT SET";
-    private double launchSpeed;
+    private double launchSpeed = 0.0;
 
-    final double backPower   = 0.75;
-    final double topPower    = 0.55;
-    final double middlePower = 0.50;
-    final double boxPower    = 0.40;
+    // This is the default shooting position for Auto.
+    // Robot is supposed to be in the middle of a White Line in Big Shooting Area
+    final double midLinePower = 0.41;
 
     public Shooter(HardwareMap hardwareMap)
     {
@@ -49,17 +48,8 @@ public class Shooter {
 
         if(gamepad.dpadUpWasPressed())
         {
-            launchSpeed  = backPower;
-            shootingMode = "BACK";
-        } else if(gamepad.dpadRightWasPressed()) {
-            launchSpeed  = topPower;
-            shootingMode = "TOP";
-        } else if(gamepad.dpadDownWasPressed()) {
-            launchSpeed  = middlePower;
-            shootingMode = "MIDDLE";
-        } else if(gamepad.dpadLeftWasPressed()) {
-            launchSpeed  = boxPower;
-            shootingMode = "BOX";
+            launchSpeed  = midLinePower;
+            shootingMode = "Mid Line";
         }
 
         if(gamepad.leftBumperWasPressed()) {

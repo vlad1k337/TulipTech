@@ -20,28 +20,38 @@ public class TulipScoreAuto extends OpMode {
 
     private enum pathState {
         STATE_STARTED,
-        STATE_CENTER,
+        STATE_SHOOT3,
+        STATE_PPG,
+        STATE_INTAKE_PPG,
+        STATE_FINISHED_PPG,
         STATE_REST,
     }
 
     private pathState currentState = pathState.STATE_STARTED;
 
-    private final Pose startPose = new Pose(108, 132, Math.toRadians(270));
-    private       Pose centerPose = new Pose(72, 72, Math.toRadians(90));
+    private final Pose startPose = new Pose(117, 131, Math.toRadians(217));
 
     final Pose PPG = new Pose(96, 83.5, Math.toRadians(0));
     final Pose PGP = new Pose(96, 59.5, Math.toRadians(0));
     final Pose GPP = new Pose(96, 35.5, Math.toRadians(0));
 
-    private PathChain moveToCenter;
+    final Pose IntakePPG = new Pose(124, 83.5, Math.toRadians(0));
+    final Pose IntakePGP = new Pose(124, 59.5, Math.toRadians(0));
+    final Pose IntakeGPP = new Pose(124, 35.5, Math.toRadians(0));
+
+    final Pose shootingPose = new Pose(101.5, 101, Math.toRadians(226));
+
+    private PathChain startToShoot;
+
+    private PathChain moveToPPG, moveToIntakePPG, finishedPPG;
 
     @Override
     public void init()
     {
-        centerPose = PPG;
-
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);
+
+        intake = new Intake(hardwareMap);
 
         buildPaths();
     }
@@ -62,24 +72,53 @@ public class TulipScoreAuto extends OpMode {
 
     public void buildPaths()
     {
-        moveToCenter = follower.pathBuilder()
-                .addPath(new BezierLine(startPose, centerPose))
-                .setLinearHeadingInterpolation(startPose.getHeading(), centerPose.getHeading())
+        startToShoot = follower.pathBuilder()
+                .addPath(new BezierLine(startPose, shootingPose))
+                .setLinearHeadingInterpolation(startPose.getHeading(), shootingPose.getHeading())
+                .build();
+
+        moveToPPG = follower.pathBuilder()
+                .addPath(new BezierLine(startPose, PPG))
+                .setLinearHeadingInterpolation(startPose.getHeading(), PPG.getHeading())
+                .build();
+
+        moveToIntakePPG = follower.pathBuilder()
+                .addPath(new BezierLine(PPG, IntakePPG))
+                .setLinearHeadingInterpolation(PPG.getHeading(), IntakePPG.getHeading())
+                .build();
+
+        finishedPPG = follower.pathBuilder()
+                .addPath(new BezierLine(IntakePPG, PPG))
+                .setLinearHeadingInterpolation(IntakePPG.getHeading(), PPG.getHeading())
                 .build();
     }
 
     public void autonomousPathUpdate() {
         switch (currentState) {
             case STATE_STARTED:
-                follower.followPath(moveToCenter, true);
-                currentState = pathState.STATE_CENTER;
+                follower.followPath(moveToPPG, true);
+                currentState = pathState.STATE_PPG;
                 break;
 
-            case STATE_CENTER:
+            case STATE_PPG:
                 if (!follower.isBusy()) {
-                    currentState = pathState.STATE_REST;
+                    intake.start();
+                    follower.followPath(moveToIntakePPG, true);
+                    currentState = pathState.STATE_INTAKE_PPG;
                 }
                 break;
+
+            case STATE_INTAKE_PPG:
+                if(!follower.isBusy()) {
+                    follower.followPath(finishedPPG, true);
+                    currentState = pathState.STATE_FINISHED_PPG;
+                }
+
+            case STATE_FINISHED_PPG:
+                if(!follower.isBusy()) {
+                    intake.stop();
+                    currentState = pathState.STATE_REST;
+                }
 
             case STATE_REST:
                 break;
