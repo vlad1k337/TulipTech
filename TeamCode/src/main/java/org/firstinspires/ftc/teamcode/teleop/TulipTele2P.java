@@ -1,17 +1,23 @@
-package org.firstinspires.ftc.teamcode.pedroPathing;
+package org.firstinspires.ftc.teamcode.teleop;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.geometry.BezierPoint;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.HeadingInterpolator;
+import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
-import org.firstinspires.ftc.teamcode.pedroPathing.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.pedroPathing.subsystems.Shooter;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.Shooter;
+
+import java.util.function.Supplier;
 
 @Configurable
 @TeleOp
@@ -22,7 +28,11 @@ public class TulipTele2P extends OpMode {
     private Follower follower;
     private TelemetryManager telemetryM;
 
-    private final Pose startingPose = new Pose(10, 20);
+    private final Pose startingPose = new Pose(0, 0, Math.toRadians(230));
+
+    private PathChain pathChain;
+
+    boolean automatedDrive = false;
 
     @Override
     public void init() {
@@ -74,6 +84,26 @@ public class TulipTele2P extends OpMode {
         shooter.update(gamepad2);
 
         intake.update(gamepad2);
+
+        if(gamepad1.x)
+        {
+            pathChain = follower.pathBuilder()
+                    .addPath(new BezierPoint(follower.getPose()))
+                    .setLinearHeadingInterpolation(follower.getHeading(), Math.toRadians(230))
+                    .build();
+
+            follower.followPath(pathChain);
+            follower.update();
+            automatedDrive = true;
+        }
+
+        if(automatedDrive && !follower.isBusy())
+        {
+            follower.startTeleOpDrive();
+            follower.update();
+
+            automatedDrive = false;
+        }
 
         updateTelemetry();
     }

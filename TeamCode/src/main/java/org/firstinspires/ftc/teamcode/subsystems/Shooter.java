@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.pedroPathing.subsystems;
+package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -19,7 +19,7 @@ public class Shooter {
 
     // This is the default shooting position for Auto.
     // Robot is supposed to be in the middle of a White Line in Big Shooting Area
-    final double midLinePower = 0.41;
+    public static final double midLinePower = 0.41;
 
     public Shooter(HardwareMap hardwareMap)
     {
@@ -60,7 +60,7 @@ public class Shooter {
 
         if(gamepad.right_trigger > 0.0)
         {
-            gate.setPosition(0.1);
+            gate.setPosition(0.3);
         } else if(gamepad.left_trigger > 0.0) {
             gate.setPosition(0.0);
         }
@@ -74,5 +74,19 @@ public class Shooter {
         telemetry.debug("Shooter Power: " + launchSpeed);
         telemetry.debug("Shooter Mode:  " + shootingMode);
         telemetry.debug("Shooter Velocity: " + motorRight.getVelocity());
+    }
+
+    public void setPower(double power)
+    {
+        motorRight.setPower(power);
+        motorLeft.setPower(-power);
+    }
+
+    public void gateClose() {
+        gate.setPosition(0.0);
+    }
+
+    public void gateOpen() {
+        gate.setPosition(0.3);
     }
 }
