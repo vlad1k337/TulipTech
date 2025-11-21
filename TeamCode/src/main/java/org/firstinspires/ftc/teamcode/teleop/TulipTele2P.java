@@ -89,7 +89,7 @@ public class TulipTele2P extends OpMode {
         {
             pathChain = follower.pathBuilder()
                     .addPath(new BezierPoint(follower.getPose()))
-                    .setLinearHeadingInterpolation(follower.getHeading(), Math.toRadians(230))
+                    .setHeadingInterpolation(HeadingInterpolator.facingPoint(132, 136))
                     .build();
 
             follower.followPath(pathChain);
