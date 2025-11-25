@@ -9,19 +9,23 @@ import com.pedropathing.geometry.BezierPoint;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.PathChain;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 @Configurable
 @TeleOp
 public class TulipTele2P extends OpMode {
+    List<LynxModule> allHubs;
     private Shooter shooter;
     private Intake intake;
 
@@ -30,12 +34,14 @@ public class TulipTele2P extends OpMode {
 
     private final Pose startingPose = new Pose(0, 0, Math.toRadians(230));
 
-    private PathChain pathChain;
-
-    boolean automatedDrive = false;
-
     @Override
     public void init() {
+        allHubs = hardwareMap.getAll(LynxModule.class);
+
+        for (LynxModule hub : allHubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
+
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 
         follower = Constants.createFollower(hardwareMap);
@@ -68,41 +74,26 @@ public class TulipTele2P extends OpMode {
     {
         shooter.sendTelemetry(telemetryM);
 
-        telemetryM.debug("Voltage: " + hardwareMap.voltageSensor.iterator().next().getVoltage());
-        telemetryM.debug("x:" + follower.getPose().getX());
-        telemetryM.debug("y:" + follower.getPose().getY());
-        telemetryM.debug("heading:" + follower.getPose().getHeading());
-
         telemetryM.update(telemetry);
     }
 
     @Override
     public void loop()
     {
+        for (LynxModule hub : allHubs) {
+            hub.clearBulkCache();
+        }
+
         updateDrive(gamepad1);
 
         shooter.update(gamepad2);
 
         intake.update(gamepad2);
 
-        if(gamepad1.x)
+        if(gamepad2.xWasPressed())
         {
-            pathChain = follower.pathBuilder()
-                    .addPath(new BezierPoint(follower.getPose()))
-                    .setHeadingInterpolation(HeadingInterpolator.facingPoint(132, 136))
-                    .build();
-
-            follower.followPath(pathChain);
-            follower.update();
-            automatedDrive = true;
-        }
-
-        if(automatedDrive && !follower.isBusy())
-        {
-            follower.startTeleOpDrive();
-            follower.update();
-
-            automatedDrive = false;
+            shooter.setReversePower(Shooter.reversePower);
+            intake.setBeltSpeed(intake.beltReverseSpeed);
         }
 
         updateTelemetry();

@@ -10,8 +10,9 @@ public class Intake {
     private DcMotorEx intake;
     private DcMotor belt;
 
-    private final double beltForwardSpeed = 1.0;
-    private final double beltReverseSpeed = 0.5;
+    public final double beltForwardSpeed = 1.0;
+    public final double beltReverseSpeed = -0.41;
+
     private final double intakeSpeed = 1.0;
 
     public Intake(HardwareMap hardwareMap)
@@ -34,8 +35,6 @@ public class Intake {
         } else if(gamepad.bWasPressed()) {
             belt.setPower(0.0);
             intake.setPower(0.0);
-        } else if(gamepad.xWasPressed()) {
-            belt.setPower(beltReverseSpeed);
         }
     }
 
@@ -49,5 +48,10 @@ public class Intake {
     {
         belt.setPower(0);
         intake.setPower(0);
+    }
+
+    public void setBeltSpeed(double speed)
+    {
+        belt.setPower(speed);
     }
 }

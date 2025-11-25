@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.bylazar.telemetry.TelemetryManager;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -13,6 +14,7 @@ public class Shooter {
     private DcMotorEx motorLeft;
 
     private Servo gate;
+    private double gatePosition;
 
     private String shootingMode = "NOT SET";
     private double launchSpeed = 0.0;
@@ -20,6 +22,7 @@ public class Shooter {
     // This is the default shooting position for Auto.
     // Robot is supposed to be in the middle of a White Line in Big Shooting Area
     public static final double midLinePower = 0.41;
+    public static final double reversePower = 0.35;
 
     public Shooter(HardwareMap hardwareMap)
     {
@@ -43,7 +46,7 @@ public class Shooter {
     {
         if(gamepad.yWasPressed()) {
             launchSpeed = 0.0;
-            shootingMode = "NOT SET";
+            shootingMode = "Not Set";
         }
 
         if(gamepad.dpadUpWasPressed())
@@ -53,20 +56,22 @@ public class Shooter {
         }
 
         if(gamepad.leftBumperWasPressed()) {
-            if (launchSpeed - 0.1 > 0.0) launchSpeed -= 0.1;
+            if (launchSpeed - 0.01 > 0.0) launchSpeed -= 0.01;
         } else if(gamepad.rightBumperWasPressed()) {
-            if(launchSpeed + 0.1 < 1.0) launchSpeed += 0.1;
+            if(launchSpeed + 0.01 < 1.0) launchSpeed += 0.01;
         }
 
         if(gamepad.right_trigger > 0.0)
         {
-            gate.setPosition(0.3);
+            gatePosition = 0.3;
         } else if(gamepad.left_trigger > 0.0) {
-            gate.setPosition(0.0);
+            gatePosition = 0.0;
         }
 
         motorRight.setPower(launchSpeed);
         motorLeft.setPower(-launchSpeed);
+
+        gate.setPosition(gatePosition);
     }
 
     public void sendTelemetry(TelemetryManager telemetry)
@@ -80,6 +85,12 @@ public class Shooter {
     {
         motorRight.setPower(power);
         motorLeft.setPower(-power);
+    }
+
+    // TO BE USED IN TELEOP
+    public void setReversePower(double power)
+    {
+        launchSpeed = -power;
     }
 
     public void gateClose() {
