@@ -4,6 +4,7 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -33,7 +34,6 @@ public class TulipScoreRed extends OpMode {
         STATE_SHOOT3,
         STATE_PPG,
         STATE_INTAKE_PPG,
-        STATE_OPEN_GATE,
         STATE_SHOOT_PPG,
         STATE_PGP,
         STATE_INTAKE_PGP,
@@ -48,32 +48,30 @@ public class TulipScoreRed extends OpMode {
 
     final Pose startPose = new Pose(118, 130, Math.toRadians(216));
 
-    final Pose PPG = new Pose(85, 85, Math.toRadians(0));
-    final Pose PGP = new Pose(85, 61, Math.toRadians(0));
-    final Pose GPP = new Pose(85, 38, Math.toRadians(0));
+    final Pose PPG = new Pose(85, 86, Math.toRadians(0));
+    final Pose PGP = new Pose(85, 62, Math.toRadians(0));
+    final Pose GPP = new Pose(85, 39, Math.toRadians(0));
 
-    final Pose IntakePPG = new Pose(115, 85, Math.toRadians(0));
-    final Pose IntakePGP = new Pose(119, 61, Math.toRadians(0));
-    final Pose IntakeGPP = new Pose(119, 38, Math.toRadians(0));
+    final Pose IntakePPG = new Pose(115, 86, Math.toRadians(0));
+    final Pose IntakePGP = new Pose(120, 62, Math.toRadians(0));
+    final Pose IntakeGPP = new Pose(120, 39, Math.toRadians(0));
 
-    final Pose shootingPose = new Pose(101, 101.5, Math.toRadians(232));
-    final Pose gatePose = new Pose(124, 70, Math.toRadians(270));
+    final Pose shootingPose = new Pose(101, 101, Math.toRadians(230));
 
     private PathChain startToShoot;
     private PathChain moveToPPG, moveToIntakePPG, shootPPG;
     private PathChain moveToPGP, moveToIntakePGP, shootPGP;
     private PathChain moveToGPP, moveToIntakeGPP, shootGPP;
-    private PathChain moveToGate;
 
-    final int timeToShoot3 = 5000;
-    final int timeToShootPPG = 4500;
-    final int timeToShootPGP = 4500;
-    final int timeToShootGPP = 4500;
+    final int timeToShoot3 = 4000;
+    final int timeToShootPPG = 4000;
+    final int timeToShootPGP = 5000;
+    final int timeToShootGPP = 5000;
 
-    final int rpmTime3 = 2500;
-    final int rpmTimePPG = 2000;
-    final int rpmTimePGP = 500;
-    final int rpmTimeGPP = 500;
+    final int rpmTime3 = 0;
+    final int rpmTimePPG = 0;
+    final int rpmTimePGP = 0;
+    final int rpmTimeGPP = 0;
 
     @Override
     public void init()
@@ -128,20 +126,14 @@ public class TulipScoreRed extends OpMode {
                 .setNoDeceleration()
                 .build();
 
-        moveToGate = follower.pathBuilder()
-                .addPath(new BezierCurve(IntakePPG, new Pose(96, 72), gatePose))
-                .setLinearHeadingInterpolation(IntakePPG.getHeading(), gatePose.getHeading())
-                .build();
-
         shootPPG = follower.pathBuilder()
                 .addPath(new BezierLine(IntakePPG, shootingPose))
-                .setLinearHeadingInterpolation(IntakeGPP.getHeading(), shootingPose.getHeading())
+                .setLinearHeadingInterpolation(IntakePPG.getHeading(), shootingPose.getHeading())
                 .build();
 
         moveToPGP = follower.pathBuilder()
                 .addPath(new BezierLine(shootingPose, PGP))
                 .setLinearHeadingInterpolation(shootingPose.getHeading(), PGP.getHeading())
-                .setNoDeceleration()
                 .build();
 
         moveToIntakePGP = follower.pathBuilder()
@@ -151,9 +143,8 @@ public class TulipScoreRed extends OpMode {
                 .build();
 
         shootPGP = follower.pathBuilder()
-                .addPath(new BezierLine(IntakePGP, shootingPose))
-                .setLinearHeadingInterpolation(IntakeGPP.getHeading(), shootingPose.getHeading())
-                .setNoDeceleration()
+                .addPath(new BezierCurve(IntakePGP, PGP.mirror(), shootingPose))
+                .setLinearHeadingInterpolation(IntakePGP.getHeading(), shootingPose.getHeading())
                 .build();
 
         moveToGPP = follower.pathBuilder()
@@ -168,9 +159,8 @@ public class TulipScoreRed extends OpMode {
                 .build();
 
         shootGPP = follower.pathBuilder()
-                .addPath(new BezierLine(IntakeGPP, shootingPose))
+                .addPath(new BezierCurve(IntakeGPP, GPP.mirror(), shootingPose))
                 .setLinearHeadingInterpolation(IntakeGPP.getHeading(), shootingPose.getHeading())
-                .setNoDeceleration()
                 .build();
     }
 
@@ -180,31 +170,32 @@ public class TulipScoreRed extends OpMode {
         {
             currentState = nextState;
             nextPath.ifPresent(pathChain -> follower.followPath(pathChain, true));
-
             return;
         }
 
+        // FUCK THIS IF STATEMENT
         if(RPMTimer.milliseconds() > rpmTime)
         {
-            intake.start();
+            intake.setBeltSpeed(1.0);
             shooter.gateOpen();
         }
 
+        // Shooting timer ended, continue auto..
         if(shootingTimer.milliseconds() > timeToShoot)
         {
-            intake.stop();
-            shooter.gateClose();
-            shooter.setPower(0.0);
-
             currentState = nextState;
             nextPath.ifPresent(pathChain -> follower.followPath(pathChain, true));
+
+            intake.stop();
+            shooter.gateClose();
+            shooter.setVelocity(0.0);
         }
     }
 
     public void getReadyToShoot()
     {
         shooter.gateClose();
-        shooter.setPower(Shooter.midLinePower);
+        shooter.setVelocity(Shooter.midLineVelocity);
         shootingTimer.reset();
         RPMTimer.reset();
     }
@@ -282,7 +273,6 @@ public class TulipScoreRed extends OpMode {
                 if(!follower.isBusy()) {
                     currentState = PathState.STATE_SHOOT_GPP;
                     follower.followPath(shootGPP);
-                    getReadyToShoot();
                     break;
                 }
 
@@ -296,7 +286,7 @@ public class TulipScoreRed extends OpMode {
                 if(!follower.isBusy()) {
                     intake.stop();
                     shooter.gateClose();
-                    shooter.setPower(0.0);
+                    shooter.setVelocity(0.0);
                 }
                 break;
         }

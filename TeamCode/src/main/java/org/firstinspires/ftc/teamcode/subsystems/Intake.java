@@ -10,10 +10,11 @@ public class Intake {
     private DcMotorEx intake;
     private DcMotor belt;
 
-    public final double beltForwardSpeed = 1.0;
-    public final double beltReverseSpeed = -0.41;
+    public final double beltForwardPower = 1.0;
+    public final double beltReversePower = -0.41;
 
-    private final double intakeSpeed = 1.0;
+    // Ticks Per Second
+    private final double intakeSpeed = 2520;
 
     public Intake(HardwareMap hardwareMap)
     {
@@ -24,34 +25,42 @@ public class Intake {
         configIntake.setAchieveableMaxRPMFraction(1.0);
         intake.setMotorType(configIntake);
         intake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     public void update(Gamepad gamepad)
     {
         if(gamepad.aWasPressed())
         {
-            belt.setPower(beltForwardSpeed);
-            intake.setPower(-intakeSpeed);
-        } else if(gamepad.bWasPressed()) {
+            belt.setPower(beltForwardPower);
+            intake.setVelocity(-intakeSpeed);
+        }
+
+        if(gamepad.bWasPressed()) {
             belt.setPower(0.0);
-            intake.setPower(0.0);
+            intake.setVelocity(0.0);
         }
     }
 
     public void start()
     {
-        belt.setPower(beltForwardSpeed);
-        intake.setPower(-intakeSpeed);
+        belt.setPower(beltForwardPower);
+        intake.setVelocity(-intakeSpeed);
     }
 
     public void stop()
     {
         belt.setPower(0);
-        intake.setPower(0);
+        intake.setVelocity(0.0);
     }
 
     public void setBeltSpeed(double speed)
     {
         belt.setPower(speed);
+    }
+
+    public void setIntakeSpeed(double speed)
+    {
+        intake.setVelocity(intakeSpeed);
     }
 }

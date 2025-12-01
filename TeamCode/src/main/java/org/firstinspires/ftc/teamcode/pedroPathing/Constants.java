@@ -18,13 +18,13 @@ public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
             .translationalPIDFCoefficients(new PIDFCoefficients(0.145, 0.0003, 0.01, 0.015))
             .headingPIDFCoefficients(new PIDFCoefficients(1.0, 0.0, 0.05, 0.01))
-            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.03, 0.0001, 0.0001, 0.6, 0.1))
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.03, 0.0001, 0.0001, 0.6, 0.05))
             .forwardZeroPowerAcceleration(-25.09)
             .lateralZeroPowerAcceleration(-63.43)
             .centripetalScaling(0.001)
             .mass(10);
 
-    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 2, 1.0);
+    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1.0);
 
     public static MecanumConstants driveConstants = new MecanumConstants()
             .useBrakeModeInTeleOp(true)

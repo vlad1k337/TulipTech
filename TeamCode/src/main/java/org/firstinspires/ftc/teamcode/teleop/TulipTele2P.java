@@ -8,6 +8,7 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.BezierPoint;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.HeadingInterpolator;
+import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -17,6 +18,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.LimelightWrapper;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 
 import java.util.List;
@@ -32,6 +34,7 @@ public class TulipTele2P extends OpMode {
     private Follower follower;
     private TelemetryManager telemetryM;
 
+    // idgaf about starting pose, only heading should matter atp
     private final Pose startingPose = new Pose(0, 0, Math.toRadians(230));
 
     @Override
@@ -48,8 +51,8 @@ public class TulipTele2P extends OpMode {
         follower.setStartingPose(startingPose);
         follower.update();
 
-        shooter = new Shooter(hardwareMap);
-        intake  = new Intake(hardwareMap);
+        shooter   = new Shooter(hardwareMap);
+        intake    = new Intake(hardwareMap);
     }
 
     @Override
@@ -89,12 +92,6 @@ public class TulipTele2P extends OpMode {
         shooter.update(gamepad2);
 
         intake.update(gamepad2);
-
-        if(gamepad2.xWasPressed())
-        {
-            shooter.setReversePower(Shooter.reversePower);
-            intake.setBeltSpeed(intake.beltReverseSpeed);
-        }
 
         updateTelemetry();
     }

@@ -17,12 +17,12 @@ public class Shooter {
     private double gatePosition;
 
     private String shootingMode = "NOT SET";
-    private double launchSpeed = 0.0;
 
     // This is the default shooting position for Auto.
-    // Robot is supposed to be in the middle of a White Line in Big Shooting Area
+    // Robot is supposed to be in the middle of a White Line of bigger shooting area
+    public static final double midLineVelocity = 1120;
+
     public static final double midLinePower = 0.41;
-    public static final double reversePower = 0.35;
 
     public Shooter(HardwareMap hardwareMap)
     {
@@ -33,11 +33,13 @@ public class Shooter {
         configR.setAchieveableMaxRPMFraction(1.0);
         motorRight.setMotorType(configR);
         motorRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         MotorConfigurationType configL = motorLeft.getMotorType().clone();
         configL.setAchieveableMaxRPMFraction(1.0);
         motorLeft.setMotorType(configL);
         motorLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         gate = hardwareMap.get(Servo.class, "Gate");
     }
@@ -45,20 +47,20 @@ public class Shooter {
     public void update(Gamepad gamepad)
     {
         if(gamepad.yWasPressed()) {
-            launchSpeed = 0.0;
+            setVelocity(0);
             shootingMode = "Not Set";
         }
 
         if(gamepad.dpadUpWasPressed())
         {
-            launchSpeed  = midLinePower;
+            setVelocity(midLineVelocity);
             shootingMode = "Mid Line";
         }
 
         if(gamepad.leftBumperWasPressed()) {
-            if (launchSpeed - 0.01 > 0.0) launchSpeed -= 0.01;
+            setVelocity(motorRight.getVelocity() - 300);
         } else if(gamepad.rightBumperWasPressed()) {
-            if(launchSpeed + 0.01 < 1.0) launchSpeed += 0.01;
+            setVelocity(motorRight.getVelocity() + 300);
         }
 
         if(gamepad.right_trigger > 0.0)
@@ -68,15 +70,11 @@ public class Shooter {
             gatePosition = 0.0;
         }
 
-        motorRight.setPower(launchSpeed);
-        motorLeft.setPower(-launchSpeed);
-
         gate.setPosition(gatePosition);
     }
 
     public void sendTelemetry(TelemetryManager telemetry)
     {
-        telemetry.debug("Shooter Power: " + launchSpeed);
         telemetry.debug("Shooter Mode:  " + shootingMode);
         telemetry.debug("Shooter Velocity: " + motorRight.getVelocity());
     }
@@ -87,10 +85,10 @@ public class Shooter {
         motorLeft.setPower(-power);
     }
 
-    // TO BE USED IN TELEOP
-    public void setReversePower(double power)
+    public void setVelocity(double velocity)
     {
-        launchSpeed = -power;
+        motorRight.setVelocity(velocity);
+        motorLeft.setVelocity(-velocity);
     }
 
     public void gateClose() {
