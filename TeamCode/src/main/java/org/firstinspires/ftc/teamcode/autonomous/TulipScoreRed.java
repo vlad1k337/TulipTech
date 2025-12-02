@@ -4,7 +4,6 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
-import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -20,7 +19,7 @@ import java.util.Optional;
 
 @Autonomous(name = "TulipScoreRed")
 public class TulipScoreRed extends OpMode {
-    final boolean DEBUG_INTAKE_ONLY = false;
+    private final boolean DEBUG_INTAKE_ONLY = false;
     List<LynxModule> allHubs;
 
     private Shooter shooter;
@@ -108,7 +107,7 @@ public class TulipScoreRed extends OpMode {
         telemetry.update();
     }
 
-    public void buildPaths()
+    private void buildPaths()
     {
         startToShoot = follower.pathBuilder()
                 .addPath(new BezierLine(startPose, shootingPose))
@@ -164,7 +163,7 @@ public class TulipScoreRed extends OpMode {
                 .build();
     }
 
-    public void shootBalls(PathState nextState, Optional<PathChain> nextPath, int timeToShoot, int rpmTime)
+    private void shootBalls(PathState nextState, Optional<PathChain> nextPath, int timeToShoot, int rpmTime)
     {
         if(DEBUG_INTAKE_ONLY)
         {
@@ -186,13 +185,13 @@ public class TulipScoreRed extends OpMode {
             currentState = nextState;
             nextPath.ifPresent(pathChain -> follower.followPath(pathChain, true));
 
-            intake.stop();
             shooter.gateClose();
+            intake.setBeltSpeed(0.0);
             shooter.setVelocity(0.0);
         }
     }
 
-    public void getReadyToShoot()
+    private void getReadyToShoot()
     {
         shooter.gateClose();
         shooter.setVelocity(Shooter.midLineVelocity);
@@ -200,7 +199,7 @@ public class TulipScoreRed extends OpMode {
         RPMTimer.reset();
     }
 
-    public void autonomousPathUpdate() {
+    private void autonomousPathUpdate() {
         switch (currentState) {
             case STATE_STARTED:
                 currentState = PathState.STATE_SHOOT3;

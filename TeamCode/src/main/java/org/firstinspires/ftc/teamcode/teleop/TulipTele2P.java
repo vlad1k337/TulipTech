@@ -4,25 +4,17 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierLine;
-import com.pedropathing.geometry.BezierPoint;
 import com.pedropathing.geometry.Pose;
-import com.pedropathing.paths.HeadingInterpolator;
-import com.pedropathing.paths.Path;
-import com.pedropathing.paths.PathChain;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.LimelightWrapper;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 
 import java.util.List;
-import java.util.function.Supplier;
 
 @Configurable
 @TeleOp
@@ -35,6 +27,7 @@ public class TulipTele2P extends OpMode {
     private TelemetryManager telemetryM;
 
     // idgaf about starting pose, only heading should matter atp
+    // later I will have to create 2 teleops for both alliances, since the heading will differ
     private final Pose startingPose = new Pose(0, 0, Math.toRadians(230));
 
     @Override
@@ -61,16 +54,21 @@ public class TulipTele2P extends OpMode {
         follower.update();
     }
 
+    private double expo(double input, double exponent)
+    {
+        return Math.pow(Math.abs(input), exponent) * Math.signum(input);
+    }
+
     private void updateDrive(Gamepad gamepad)
     {
-        follower.update();
-
         follower.setTeleOpDrive(
-                -gamepad.left_stick_y,
-                -gamepad.left_stick_x,
-                -gamepad.right_stick_x,
+                expo(-gamepad.left_stick_y, 3.0),
+                expo(-gamepad.left_stick_x, 3.0),
+                expo(-gamepad.right_stick_x, 2.1),
                 true
         );
+
+        follower.update();
     }
 
     private void updateTelemetry()

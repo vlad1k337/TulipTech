@@ -193,7 +193,7 @@ public class TulipScoreBlue extends OpMode {
     public void getReadyToShoot()
     {
         shooter.gateClose();
-        shooter.setPower(Shooter.midLinePower);
+        shooter.setVelocity(Shooter.midLineVelocity);
         shootingTimer.reset();
         RPMTimer.reset();
     }

@@ -11,7 +11,6 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.LimelightWrapper;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 
 @Configurable
@@ -23,7 +22,7 @@ public class TulipTele1P extends OpMode {
     private Follower follower;
     private TelemetryManager telemetryM;
 
-    private final Pose startingPose = new Pose(10, 20);
+    private final Pose startingPose = new Pose(0, 0, 0);
 
     @Override
     public void init() {
@@ -45,14 +44,14 @@ public class TulipTele1P extends OpMode {
 
     private void updateDrive(Gamepad gamepad)
     {
-        follower.update();
-
         follower.setTeleOpDrive(
                 -gamepad.left_stick_y,
                 -gamepad.left_stick_x,
                 -gamepad.right_stick_x,
                 true
         );
+
+        follower.update();
     }
 
     private void updateTelemetry()
