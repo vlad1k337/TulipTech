@@ -1,18 +1,16 @@
-package org.firstinspires.ftc.teamcode.autonomous;
+package org.firstinspires.ftc.teamcode.Autonomous;
 
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierCurve;
-import com.pedropathing.geometry.BezierLine;
-import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.Shooter;
+import org.firstinspires.ftc.teamcode.Paths.PathsRed;
+import org.firstinspires.ftc.teamcode.Pedro.Constants;
+import org.firstinspires.ftc.teamcode.Subsystem.Intake;
+import org.firstinspires.ftc.teamcode.Subsystem.Shooter;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +18,9 @@ import java.util.Optional;
 @Autonomous(name = "TulipScoreRed")
 public class TulipScoreRed extends OpMode {
     private final boolean DEBUG_INTAKE_ONLY = false;
-    List<LynxModule> allHubs;
+    private List<LynxModule> allHubs;
+
+    private PathsRed paths;
 
     private Shooter shooter;
     private Intake intake;
@@ -45,32 +45,15 @@ public class TulipScoreRed extends OpMode {
 
     private PathState currentState = PathState.STATE_STARTED;
 
-    final Pose startPose = new Pose(118, 130, Math.toRadians(216));
+    final int timeToShoot3 = 4500;
+    final int timeToShootPPG = 4500;
+    final int timeToShootPGP = 4500;
+    final int timeToShootGPP = 4500;
 
-    final Pose PPG = new Pose(85, 86, Math.toRadians(0));
-    final Pose PGP = new Pose(85, 62, Math.toRadians(0));
-    final Pose GPP = new Pose(85, 39, Math.toRadians(0));
-
-    final Pose IntakePPG = new Pose(115, 86, Math.toRadians(0));
-    final Pose IntakePGP = new Pose(120, 62, Math.toRadians(0));
-    final Pose IntakeGPP = new Pose(120, 39, Math.toRadians(0));
-
-    final Pose shootingPose = new Pose(101, 101, Math.toRadians(230));
-
-    private PathChain startToShoot;
-    private PathChain moveToPPG, moveToIntakePPG, shootPPG;
-    private PathChain moveToPGP, moveToIntakePGP, shootPGP;
-    private PathChain moveToGPP, moveToIntakeGPP, shootGPP;
-
-    final int timeToShoot3 = 4000;
-    final int timeToShootPPG = 4000;
-    final int timeToShootPGP = 5000;
-    final int timeToShootGPP = 5000;
-
-    final int rpmTime3 = 0;
-    final int rpmTimePPG = 0;
-    final int rpmTimePGP = 0;
-    final int rpmTimeGPP = 0;
+    final int rpmTime3 = 1250;
+    final int rpmTimePPG = 1000;
+    final int rpmTimePGP = 750;
+    final int rpmTimeGPP = 500;
 
     @Override
     public void init()
@@ -82,7 +65,9 @@ public class TulipScoreRed extends OpMode {
         }
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(startPose);
+        follower.setStartingPose(PathsRed.startPose);
+
+        paths = new PathsRed(follower);
 
         shooter = new Shooter(hardwareMap);
         intake = new Intake(hardwareMap);
@@ -90,7 +75,7 @@ public class TulipScoreRed extends OpMode {
         shootingTimer = new ElapsedTime();
         RPMTimer = new ElapsedTime();
 
-        buildPaths();
+
     }
 
     @Override
@@ -102,65 +87,6 @@ public class TulipScoreRed extends OpMode {
 
         autonomousPathUpdate();
         follower.update();
-
-        telemetry.addData("path state", currentState);
-        telemetry.update();
-    }
-
-    private void buildPaths()
-    {
-        startToShoot = follower.pathBuilder()
-                .addPath(new BezierLine(startPose, shootingPose))
-                .setLinearHeadingInterpolation(startPose.getHeading(), shootingPose.getHeading())
-                .build();
-
-        moveToPPG = follower.pathBuilder()
-                .addPath(new BezierLine(shootingPose, PPG))
-                .setLinearHeadingInterpolation(shootingPose.getHeading(), PPG.getHeading())
-                .build();
-
-        moveToIntakePPG = follower.pathBuilder()
-                .addPath(new BezierLine(PPG, IntakePPG))
-                .setTangentHeadingInterpolation()
-                .setNoDeceleration()
-                .build();
-
-        shootPPG = follower.pathBuilder()
-                .addPath(new BezierLine(IntakePPG, shootingPose))
-                .setLinearHeadingInterpolation(IntakePPG.getHeading(), shootingPose.getHeading())
-                .build();
-
-        moveToPGP = follower.pathBuilder()
-                .addPath(new BezierLine(shootingPose, PGP))
-                .setLinearHeadingInterpolation(shootingPose.getHeading(), PGP.getHeading())
-                .build();
-
-        moveToIntakePGP = follower.pathBuilder()
-                .addPath(new BezierLine(PGP, IntakePGP))
-                .setTangentHeadingInterpolation()
-                .setNoDeceleration()
-                .build();
-
-        shootPGP = follower.pathBuilder()
-                .addPath(new BezierCurve(IntakePGP, PGP.mirror(), shootingPose))
-                .setLinearHeadingInterpolation(IntakePGP.getHeading(), shootingPose.getHeading())
-                .build();
-
-        moveToGPP = follower.pathBuilder()
-                .addPath(new BezierLine(shootingPose, GPP))
-                .setLinearHeadingInterpolation(shootingPose.getHeading(), GPP.getHeading())
-                .build();
-
-        moveToIntakeGPP = follower.pathBuilder()
-                .addPath(new BezierLine(GPP, IntakeGPP))
-                .setTangentHeadingInterpolation()
-                .setNoDeceleration()
-                .build();
-
-        shootGPP = follower.pathBuilder()
-                .addPath(new BezierCurve(IntakeGPP, GPP.mirror(), shootingPose))
-                .setLinearHeadingInterpolation(IntakeGPP.getHeading(), shootingPose.getHeading())
-                .build();
     }
 
     private void shootBalls(PathState nextState, Optional<PathChain> nextPath, int timeToShoot, int rpmTime)
@@ -186,7 +112,7 @@ public class TulipScoreRed extends OpMode {
             nextPath.ifPresent(pathChain -> follower.followPath(pathChain, true));
 
             shooter.gateClose();
-            intake.setBeltSpeed(0.0);
+            intake.stop();
             shooter.setVelocity(0.0);
         }
     }
@@ -203,13 +129,13 @@ public class TulipScoreRed extends OpMode {
         switch (currentState) {
             case STATE_STARTED:
                 currentState = PathState.STATE_SHOOT3;
-                follower.followPath(startToShoot, true);
+                follower.followPath(paths.startToShoot, true);
                 getReadyToShoot();
                 break;
 
             case STATE_SHOOT3:
                 if (!follower.isBusy()) {
-                    shootBalls(PathState.STATE_PPG, Optional.of(moveToPPG), timeToShoot3, rpmTime3);
+                    shootBalls(PathState.STATE_PPG, Optional.of(paths.moveToPPG), timeToShoot3, rpmTime3);
                 }
                 break;
 
@@ -218,21 +144,21 @@ public class TulipScoreRed extends OpMode {
                     intake.start();
                     shooter.gateClose();
                     currentState = PathState.STATE_INTAKE_PPG;
-                    follower.followPath(moveToIntakePPG);
+                    follower.followPath(paths.moveToIntakePPG);
                     break;
                 }
 
             case STATE_INTAKE_PPG:
                 if(!follower.isBusy()) {
                     currentState = PathState.STATE_SHOOT_PPG;
-                    follower.followPath(shootPPG);
+                    follower.followPath(paths.shootPPG);
                     getReadyToShoot();
                     break;
                 }
 
             case STATE_SHOOT_PPG:
                 if(!follower.isBusy()) {
-                    shootBalls(PathState.STATE_PGP, Optional.of(moveToPGP), timeToShootPPG, rpmTimePPG);
+                    shootBalls(PathState.STATE_PGP, Optional.of(paths.moveToPGP), timeToShootPPG, rpmTimePPG);
                     break;
                 }
 
@@ -241,21 +167,21 @@ public class TulipScoreRed extends OpMode {
                     intake.start();
                     shooter.gateClose();
                     currentState = PathState.STATE_INTAKE_PGP;
-                    follower.followPath(moveToIntakePGP);
+                    follower.followPath(paths.moveToIntakePGP);
                     break;
                 }
 
             case STATE_INTAKE_PGP:
                 if(!follower.isBusy()) {
                     currentState = PathState.STATE_SHOOT_PGP;
-                    follower.followPath(shootPGP);
+                    follower.followPath(paths.shootPGP);
                     getReadyToShoot();
                     break;
                 }
 
             case STATE_SHOOT_PGP:
                 if(!follower.isBusy()) {
-                    shootBalls(PathState.STATE_GPP, Optional.of(moveToGPP), timeToShootPGP, rpmTimePGP);
+                    shootBalls(PathState.STATE_GPP, Optional.of(paths.moveToGPP), timeToShootPGP, rpmTimePGP);
                     break;
                 }
 
@@ -264,20 +190,21 @@ public class TulipScoreRed extends OpMode {
                     intake.start();
                     shooter.gateClose();
                     currentState = PathState.STATE_INTAKE_GPP;
-                    follower.followPath(moveToIntakeGPP);
+                    follower.followPath(paths.moveToIntakeGPP);
                     break;
                 }
 
             case STATE_INTAKE_GPP:
                 if(!follower.isBusy()) {
                     currentState = PathState.STATE_SHOOT_GPP;
-                    follower.followPath(shootGPP);
+                    follower.followPath(paths.shootGPP);
+                    getReadyToShoot();
                     break;
                 }
 
             case STATE_SHOOT_GPP:
                 if(!follower.isBusy()) {
-                    shootBalls(PathState.STATE_REST, Optional.of(moveToPGP), timeToShootGPP, rpmTimeGPP);
+                    shootBalls(PathState.STATE_REST, Optional.of(paths.moveToPGP), timeToShootGPP, rpmTimeGPP);
                     break;
                 }
 

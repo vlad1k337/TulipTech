@@ -38,13 +38,17 @@ android {
 }
 
 repositories {
+    // Dairy releases repository
     maven {
         url = "https://repo.dairy.foundation/releases"
     }
+    // Dairy snapshots repository
+    maven {
+        url = "https://repo.dairy.foundation/snapshots"
+    }
 }
+
 dependencies {
     implementation project(':FtcRobotController')
-    implementation("com.acmerobotics.slothboard:dashboard:0.2.4+0.4.17")
-
-
+    implementation("dev.frozenmilk.sinister:Sloth:0.2.4")
 }

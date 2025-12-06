@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.utilmodes;
+package org.firstinspires.ftc.teamcode.Tele.Utilmodes;
 
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.Pedro.Constants;
 
 @TeleOp
 public class StickExpoTuner extends OpMode {
@@ -44,14 +44,14 @@ public class StickExpoTuner extends OpMode {
         if(gamepad.leftBumperWasPressed())
         {
             left_stick += 0.1;
-        } else if(gamepad.left_trigger > 0) {
+        } else if(gamepad.left_trigger > 0.5) {
             left_stick -= 0.1;
         }
 
         if(gamepad.rightBumperWasPressed())
         {
             right_stick += 0.1;
-        } else if(gamepad.right_trigger > 0) {
+        } else if(gamepad.right_trigger > 0.5) {
             right_stick -= 0.1;
         }
 

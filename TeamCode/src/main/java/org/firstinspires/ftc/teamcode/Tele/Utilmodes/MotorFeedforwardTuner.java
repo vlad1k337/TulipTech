@@ -1,8 +1,7 @@
-package org.firstinspires.ftc.teamcode.utilmodes;
+package org.firstinspires.ftc.teamcode.Tele.Utilmodes;
 
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
-import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -15,7 +14,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 @TeleOp
 public class MotorFeedforwardTuner extends OpMode {
     private TelemetryManager telemetryM;
-    private Follower follower;
 
     private final double targetVelocity = 1140;
 
@@ -24,13 +22,13 @@ public class MotorFeedforwardTuner extends OpMode {
     private double D = 0;
     private double F = 0;
 
-    private String motorName = "launchL";
+    private String motorName = "launchR";
     private DcMotorEx motor;
 
     @Override
     public void init() {
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
-        motor  = hardwareMap.get(DcMotorEx.class, motorName);
+        motor = hardwareMap.get(DcMotorEx.class, motorName);
 
         MotorConfigurationType configR = motor.getMotorType().clone();
         configR.setAchieveableMaxRPMFraction(1.0);
@@ -40,8 +38,9 @@ public class MotorFeedforwardTuner extends OpMode {
 
         PIDFCoefficients coefficients = motor.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
         P = coefficients.p;
-        I = coefficients.i;
+        I = 0;
         D = coefficients.d;
+        F = 13.65;
     }
 
     @Override
@@ -65,9 +64,16 @@ public class MotorFeedforwardTuner extends OpMode {
 
         if(gamepad1.rightBumperWasPressed())
         {
-            F += 0.25;
+            P += 0.25;
         } else if(gamepad1.leftBumperWasPressed()) {
-            F -= 0.25;
+            P -= 0.25;
+        }
+
+        if(gamepad1.dpadUpWasPressed())
+        {
+            D += 0.25;
+        } else if(gamepad1.dpadDownWasPressed()) {
+            D -= 0.25;
         }
 
         motor.setVelocityPIDFCoefficients(P, I, D, F);

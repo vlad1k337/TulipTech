@@ -1,8 +1,5 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode.Subsystem;
 import com.bylazar.telemetry.TelemetryManager;
-import com.pedropathing.ftc.FTCCoordinates;
-import com.pedropathing.geometry.PedroCoordinates;
-import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -28,19 +25,7 @@ public class LimelightWrapper {
 
         for(LLResultTypes.FiducialResult fiducial : result.getFiducialResults())
         {
-            Pose3D robotPoseFtc = fiducial.getRobotPoseFieldSpace();
-            Pose robotPosePedro = new Pose(
-                    robotPoseFtc.getPosition().x,
-                    robotPoseFtc.getPosition().y,
-                    robotPoseFtc.getOrientation().getYaw(),
-                    FTCCoordinates.INSTANCE
-            ).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
-
-            telemetry.addData("Distance", fiducial.getRobotPoseTargetSpace().getPosition().x);
-            telemetry.addData("Lime X: ", robotPosePedro.getX());
-            telemetry.addData("Lime Y: ", robotPosePedro.getY());
-            telemetry.addData("Lime Heading: ", robotPosePedro.getHeading());
-            telemetry.addData("AprilTag heading: ", fiducial.getTargetXDegrees());
+            Pose3D robotPoseFtc = result.getBotpose();
         }
     }
 

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.pedroPathing;
+package org.firstinspires.ftc.teamcode.Pedro;
 
 import com.pedropathing.control.FilteredPIDFCoefficients;
 import com.pedropathing.control.PIDFCoefficients;
@@ -16,12 +16,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .translationalPIDFCoefficients(new PIDFCoefficients(0.145, 0.0, 0.01, 0.015))
-            .headingPIDFCoefficients(new PIDFCoefficients(1.0, 0.0, 0.05, 0.01))
-            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.025, 0.0, 0.0001, 0.6, 0.025))
-            .forwardZeroPowerAcceleration(-25.09)
-            .lateralZeroPowerAcceleration(-63.43)
-            .centripetalScaling(0.001)
+            .translationalPIDFCoefficients(new PIDFCoefficients(0.2, 0.0, 0.0175, 0.015))
+            .headingPIDFCoefficients(new PIDFCoefficients(1.0, 0.0, 0.075, 0.01))
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.021, 0.0, 0.00025, 0.6, 0.075))
+            .forwardZeroPowerAcceleration(-34.99)
+            .lateralZeroPowerAcceleration(-67.109)
+            .centripetalScaling(0.0025)
             .mass(10);
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1.0);
@@ -33,12 +33,12 @@ public class Constants {
             .rightRearMotorName("BR")
             .leftRearMotorName("BL")
             .leftFrontMotorName("FL")
-            .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
+            .leftFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
+            .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .xVelocity(64.106)
-            .yVelocity(51.81186);
+            .xVelocity(69.83)
+            .yVelocity(54.61);
 
     public static PinpointConstants localizerPinpointConstants = new PinpointConstants()
             .forwardPodY(4.125)

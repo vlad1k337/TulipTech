@@ -1,43 +1,33 @@
-package org.firstinspires.ftc.teamcode.teleop;
+package org.firstinspires.ftc.teamcode.Tele;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
-import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.Shooter;
-
-import java.util.List;
+import org.firstinspires.ftc.teamcode.Pedro.Constants;
+import org.firstinspires.ftc.teamcode.Subsystem.Intake;
+import org.firstinspires.ftc.teamcode.Subsystem.Shooter;
 
 @Configurable
-@TeleOp
-public class TulipTele2P extends OpMode {
-    List<LynxModule> allHubs;
+@TeleOp(name = "Tulip1P")
+public class Tulip1P extends OpMode {
     private Shooter shooter;
     private Intake intake;
 
     private Follower follower;
     private TelemetryManager telemetryM;
 
-    // idgaf about starting pose, only heading should matter atp
-    // later I will have to create 2 teleops for both alliances, since the heading will differ
-    private final Pose startingPose = new Pose(0, 0, Math.toRadians(230));
+    boolean isTurning = false;
+
+    private final Pose startingPose = new Pose(72, 72, 0);
 
     @Override
     public void init() {
-        allHubs = hardwareMap.getAll(LynxModule.class);
-
-        for (LynxModule hub : allHubs) {
-            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
-        }
-
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 
         follower = Constants.createFollower(hardwareMap);
@@ -54,42 +44,43 @@ public class TulipTele2P extends OpMode {
         follower.update();
     }
 
-    private double expo(double input, double exponent)
-    {
-        return Math.pow(Math.abs(input), exponent) * Math.signum(input);
-    }
-
     private void updateDrive(Gamepad gamepad)
     {
         follower.setTeleOpDrive(
-                expo(-gamepad.left_stick_y, 3.0),
-                expo(-gamepad.left_stick_x, 3.0),
-                expo(-gamepad.right_stick_x, 2.1),
-                true
-        );
+                -gamepad.left_stick_y,
+                -gamepad.left_stick_x,
+                -gamepad.right_stick_x,
+                    true);
 
         follower.update();
+    }
+
+    private double calculateDistance(double x1, double y1, double x2, double y2) {
+        double xDifference = x2 - x1;
+        double yDifference = y2 - y1;
+        double distanceSquared = Math.pow(xDifference, 2) + Math.pow(yDifference, 2);
+        return Math.sqrt(distanceSquared);
     }
 
     private void updateTelemetry()
     {
         shooter.sendTelemetry(telemetryM);
 
+        telemetryM.addData("Heading", Math.toDegrees(follower.getHeading()));
+        telemetryM.addData("X", follower.getPose().getX());
+        telemetryM.addData("Y", follower.getPose().getY());
+        telemetryM.addData("Distance to (144, 144)", calculateDistance(144, 144, follower.getPose().getX(), follower.getPose().getY()));
         telemetryM.update(telemetry);
     }
 
     @Override
     public void loop()
     {
-        for (LynxModule hub : allHubs) {
-            hub.clearBulkCache();
-        }
-
         updateDrive(gamepad1);
 
-        shooter.update(gamepad2);
+        shooter.update(gamepad1, intake.belt);
 
-        intake.update(gamepad2);
+        intake.update(gamepad1, gamepad2);
 
         updateTelemetry();
     }

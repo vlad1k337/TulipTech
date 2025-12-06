@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode.Subsystem;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -8,11 +8,11 @@ import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigu
 
 public class Intake {
     private final DcMotorEx intake;
-    private final DcMotorEx belt;
+    public final DcMotorEx belt;
 
+    // This is still here because we might have to adjust the belt speed
+    // Intake belt could easily get ripped off mid-game due to physical factors
     public final double beltForwardPower = 1.0;
-    // Ticks Per Second
-    private final double intakeSpeed = 2520;
 
     public Intake(HardwareMap hardwareMap)
     {
@@ -24,29 +24,30 @@ public class Intake {
         configBelt.setAchieveableMaxRPMFraction(1.0);
         belt.setMotorType(configBelt);
 
+        // Just crank up the power pls
         MotorConfigurationType configIntake = intake.getMotorType().clone();
         configIntake.setAchieveableMaxRPMFraction(1.0);
         intake.setMotorType(configIntake);
-        intake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
-    public void update(Gamepad gamepad)
+    public void update(Gamepad gamepad1, Gamepad gamepad2)
     {
-        if(gamepad.aWasPressed())
+        if(gamepad1.aWasPressed() || gamepad2.aWasPressed())
         {
             belt.setPower(beltForwardPower);
-            intake.setVelocity(-intakeSpeed);
+            intake.setPower(-1.0);
         }
 
-        if(gamepad.bWasPressed()) {
+        if(gamepad1.bWasPressed() || gamepad2.bWasPressed()) {
             belt.setPower(0.0);
-            intake.setVelocity(0.0);
+            intake.setPower(0.0);
         }
 
         // For the second driver to only activate the belt
         // This should useful because intake + belt together take crap ton of voltage
-        if(gamepad.xWasPressed())
+        if(gamepad1.xWasPressed() || gamepad2.xWasPressed())
         {
             belt.setPower(beltForwardPower);
         }
@@ -55,13 +56,13 @@ public class Intake {
     public void start()
     {
         belt.setPower(beltForwardPower);
-        intake.setVelocity(-intakeSpeed);
+        intake.setPower(-1.0);
     }
 
     public void stop()
     {
         belt.setPower(0);
-        intake.setVelocity(0.0);
+        intake.setPower(0.0);
     }
 
     public void setBeltSpeed(double speed)
@@ -71,6 +72,6 @@ public class Intake {
 
     public void setIntakeSpeed(double speed)
     {
-        intake.setVelocity(speed);
+        intake.setPower(-speed);
     }
 }
