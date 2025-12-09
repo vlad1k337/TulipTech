@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Tele;
+package org.firstinspires.ftc.teamcode.teleop;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
@@ -21,8 +21,6 @@ public class Tulip1P extends OpMode {
 
     private Follower follower;
     private TelemetryManager telemetryM;
-
-    boolean isTurning = false;
 
     private final Pose startingPose = new Pose(72, 72, 0);
 

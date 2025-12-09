@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Tele;
+package org.firstinspires.ftc.teamcode.teleop;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;

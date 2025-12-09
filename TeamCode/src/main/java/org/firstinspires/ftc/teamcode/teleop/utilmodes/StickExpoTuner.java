@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Tele.Utilmodes;
+package org.firstinspires.ftc.teamcode.teleop.utilmodes;
 
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;

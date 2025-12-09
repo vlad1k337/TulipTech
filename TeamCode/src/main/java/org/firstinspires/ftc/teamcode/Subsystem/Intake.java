@@ -9,8 +9,8 @@ import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigu
 import dev.frozenmilk.dairy.cachinghardware.CachingDcMotorEx;
 
 public class Intake {
-    private final DcMotorEx intake;
-    public  final DcMotorEx belt;
+    private final CachingDcMotorEx intake;
+    public  final CachingDcMotorEx belt;
 
     // This is still here because we might have to adjust the belt speed
     // Intake belt could easily get ripped off mid-game due to physical factors
@@ -18,8 +18,8 @@ public class Intake {
 
     public Intake(HardwareMap hardwareMap)
     {
-        belt    = hardwareMap.get(DcMotorEx.class, "Belt");
-        intake  = hardwareMap.get(DcMotorEx.class, "Intake");
+        belt    = new CachingDcMotorEx(hardwareMap.get(DcMotorEx.class, "Belt"));
+        intake  = new CachingDcMotorEx(hardwareMap.get(DcMotorEx.class, "Intake"));
 
         // Lets just pray this will help our intake
         MotorConfigurationType configBelt = belt.getMotorType().clone();
@@ -70,10 +70,5 @@ public class Intake {
     public void setBeltSpeed(double speed)
     {
         belt.setPower(speed);
-    }
-
-    public void setIntakeSpeed(double speed)
-    {
-        intake.setPower(-speed);
     }
 }

@@ -81,10 +81,11 @@ public class TulipScoreBlue extends OpMode {
     @Override
     public void loop()
     {
-
         for (LynxModule hub : allHubs) {
             hub.clearBulkCache();
         }
+
+        shooter.updateFeedforward();
 
         autonomousPathUpdate();
         follower.update();
