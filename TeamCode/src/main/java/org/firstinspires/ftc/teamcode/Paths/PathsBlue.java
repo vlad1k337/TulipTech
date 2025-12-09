@@ -7,16 +7,16 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 
 public class PathsBlue {
-    public static final Pose startPose = new Pose(20, 120, Math.toRadians(270));
-    final Pose shootingPose = new Pose(43, 102, Math.toRadians(313));
+    public static final Pose startPose = new Pose(20, 121, Math.toRadians(270));
+    final Pose shootingPose = new Pose(43, 100, Math.toRadians(313));
 
-    final Pose PPG = new Pose(85, 84, Math.toRadians(0)).mirror();
-    final Pose PGP = new Pose(85, 60, Math.toRadians(0)).mirror();
-    final Pose GPP = new Pose(85, 37, Math.toRadians(0)).mirror();
+    final Pose PPG = new Pose(89, 83, Math.toRadians(0)).mirror();
+    final Pose PGP = new Pose(89, 59, Math.toRadians(0)).mirror();
+    final Pose GPP = new Pose(89, 36, Math.toRadians(0)).mirror();
 
-    final Pose IntakePPG = new Pose(115, 84, Math.toRadians(0)).mirror();
-    final Pose IntakePGP = new Pose(120, 60, Math.toRadians(0)).mirror();
-    final Pose IntakeGPP = new Pose(120, 37, Math.toRadians(0)).mirror();
+    final Pose IntakePPG = new Pose(120, 83, Math.toRadians(0)).mirror();
+    final Pose IntakePGP = new Pose(125, 59, Math.toRadians(0)).mirror();
+    final Pose IntakeGPP = new Pose(125, 36, Math.toRadians(0)).mirror();
 
     public PathChain startToShoot;
     public PathChain moveToPPG, moveToIntakePPG, shootPPG;
@@ -74,7 +74,7 @@ public class PathsBlue {
                 .build();
 
         shootGPP = follower.pathBuilder()
-                .addPath(new BezierCurve(IntakeGPP, GPP.mirror(), shootingPose))
+                .addPath(new BezierLine(IntakeGPP, shootingPose))
                 .setLinearHeadingInterpolation(IntakeGPP.getHeading(), shootingPose.getHeading())
                 .build();
     }

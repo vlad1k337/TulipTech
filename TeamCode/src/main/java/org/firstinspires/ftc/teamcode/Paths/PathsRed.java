@@ -7,16 +7,16 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 
 public class PathsRed {
-    public static final Pose startPose = new Pose(124, 120, Math.toRadians(270));
+    public static final Pose startPose = new Pose(124, 121, Math.toRadians(270));
     final Pose shootingPose = new Pose(101, 102, Math.toRadians(229));
 
-    private final Pose PPG = new Pose(87, 84, Math.toRadians(0));
-    private final Pose PGP = new Pose(87, 60, Math.toRadians(0));
-    private final Pose GPP = new Pose(87, 37, Math.toRadians(0));
+    final Pose PPG = new Pose(89, 83, Math.toRadians(0));
+    final Pose PGP = new Pose(89, 59, Math.toRadians(0));
+    final Pose GPP = new Pose(89, 36, Math.toRadians(0));
 
-    final Pose IntakePPG = new Pose(115, 84, Math.toRadians(0));
-    final Pose IntakePGP = new Pose(120, 60, Math.toRadians(0));
-    final Pose IntakeGPP = new Pose(120, 37, Math.toRadians(0));
+    final Pose IntakePPG = new Pose(120, 83, Math.toRadians(0));
+    final Pose IntakePGP = new Pose(125, 59, Math.toRadians(0));
+    final Pose IntakeGPP = new Pose(125, 36, Math.toRadians(0));
 
     public PathChain startToShoot;
     public PathChain moveToPPG, moveToIntakePPG, shootPPG;
@@ -74,7 +74,7 @@ public class PathsRed {
                 .build();
 
         shootGPP = follower.pathBuilder()
-                .addPath(new BezierCurve(IntakeGPP, GPP.mirror(), shootingPose))
+                .addPath(new BezierLine(IntakeGPP, shootingPose))
                 .setLinearHeadingInterpolation(IntakeGPP.getHeading(), shootingPose.getHeading())
                 .build();
     }

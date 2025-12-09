@@ -11,12 +11,12 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.Pedro.Constants;
 import org.firstinspires.ftc.teamcode.Subsystem.Intake;
-import org.firstinspires.ftc.teamcode.Subsystem.Shooter;
+import org.firstinspires.ftc.teamcode.Subsystem.ShooterFeedforward;
 
 @Configurable
 @TeleOp(name = "Tulip1P")
 public class Tulip1P extends OpMode {
-    private Shooter shooter;
+    private ShooterFeedforward shooter;
     private Intake intake;
 
     private Follower follower;
@@ -34,7 +34,7 @@ public class Tulip1P extends OpMode {
         follower.setStartingPose(startingPose);
         follower.update();
 
-        shooter   = new Shooter(hardwareMap);
+        shooter   = new ShooterFeedforward(hardwareMap);
         intake    = new Intake(hardwareMap);
     }
 
@@ -50,7 +50,7 @@ public class Tulip1P extends OpMode {
                 -gamepad.left_stick_y,
                 -gamepad.left_stick_x,
                 -gamepad.right_stick_x,
-                    true);
+                    false);
 
         follower.update();
     }
@@ -64,8 +64,7 @@ public class Tulip1P extends OpMode {
 
     private void updateTelemetry()
     {
-        shooter.sendTelemetry(telemetryM);
-
+        shooter.updateTelemetry(telemetryM);
         telemetryM.addData("Heading", Math.toDegrees(follower.getHeading()));
         telemetryM.addData("X", follower.getPose().getX());
         telemetryM.addData("Y", follower.getPose().getY());
@@ -78,7 +77,7 @@ public class Tulip1P extends OpMode {
     {
         updateDrive(gamepad1);
 
-        shooter.update(gamepad1, intake.belt);
+        shooter.update(gamepad1);
 
         intake.update(gamepad1, gamepad2);
 

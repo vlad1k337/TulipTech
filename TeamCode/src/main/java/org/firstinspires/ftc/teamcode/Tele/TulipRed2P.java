@@ -6,7 +6,6 @@ import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierPoint;
 import com.pedropathing.geometry.Pose;
-import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.Path;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -15,7 +14,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.Pedro.Constants;
 import org.firstinspires.ftc.teamcode.Subsystem.Intake;
-import org.firstinspires.ftc.teamcode.Subsystem.Shooter;
+import org.firstinspires.ftc.teamcode.Subsystem.ShooterFeedforward;
 
 import java.util.List;
 
@@ -23,7 +22,7 @@ import java.util.List;
 @TeleOp(name = "TulipRed2P")
 public class TulipRed2P extends OpMode {
     List<LynxModule> allHubs;
-    private Shooter shooter;
+    private ShooterFeedforward shooter;
     private Intake intake;
 
     private Follower follower;
@@ -46,8 +45,8 @@ public class TulipRed2P extends OpMode {
         follower.setStartingPose(startingPose);
         follower.update();
 
-        shooter   = new Shooter(hardwareMap);
-        intake    = new Intake(hardwareMap);
+        shooter = new ShooterFeedforward(hardwareMap);
+        intake = new Intake(hardwareMap);
     }
 
     @Override
@@ -56,15 +55,12 @@ public class TulipRed2P extends OpMode {
         follower.update();
     }
 
-    private double expo(double input, double exponent)
-    {
+    private double expo(double input, double exponent) {
         return Math.pow(Math.abs(input), exponent) * Math.signum(input);
     }
 
-    private void updateDrive(Gamepad gamepad)
-    {
-        if(!automatedDrive)
-        {
+    private void updateDrive(Gamepad gamepad) {
+        if (!automatedDrive) {
             follower.setTeleOpDrive(
                     -gamepad.left_stick_y,
                     -gamepad.left_stick_x,
@@ -73,18 +69,15 @@ public class TulipRed2P extends OpMode {
             );
         }
 
-        if(gamepad.left_trigger > 0.3 && !follower.isBusy())
-        {
+        if (gamepad.left_trigger > 0.3 && !follower.isBusy()) {
             follower.followPath(follower.pathBuilder()
                     .addPath(new Path(new BezierPoint(follower.getPose())))
-                    //.setLinearHeadingInterpolation(follower.getHeading(), Math.toRadians(230))
-                            .setHeadingInterpolation(HeadingInterpolator.facingPoint(new Pose(132, 136)))
+                    .setLinearHeadingInterpolation(follower.getHeading(), Math.toRadians(180) + Math.atan2(144 - follower.getPose().getY(), 144 - follower.getPose().getX()))
                     .build());
             automatedDrive = true;
         }
 
-        if(automatedDrive && !follower.isBusy())
-        {
+        if (automatedDrive && !follower.isBusy()) {
             follower.startTeleopDrive();
             automatedDrive = false;
         }
@@ -92,16 +85,14 @@ public class TulipRed2P extends OpMode {
         follower.update();
     }
 
-    private void updateTelemetry()
-    {
-        shooter.sendTelemetry(telemetryM);
+    private void updateTelemetry() {
+        shooter.updateTelemetry(telemetryM);
 
         telemetryM.update(telemetry);
     }
 
     @Override
-    public void loop()
-    {
+    public void loop() {
         // pls make our loop times smaller
         for (LynxModule hub : allHubs) {
             hub.clearBulkCache();
@@ -109,7 +100,7 @@ public class TulipRed2P extends OpMode {
 
         updateDrive(gamepad1);
 
-        shooter.update(gamepad2, intake.belt);
+        shooter.update(gamepad2);
 
         intake.update(gamepad1, gamepad2);
 

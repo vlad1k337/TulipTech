@@ -11,11 +11,14 @@
 
 // Custom definitions may go here
 buildscript {
+    ext.kotlin_version = '2.2.20'
+
     repositories {
         mavenCentral()
         maven {
             url "https://repo.dairy.foundation/releases"
         }
+        google()
     }
     dependencies {
         classpath "dev.frozenmilk:Load:0.2.4"
@@ -50,5 +53,8 @@ repositories {
 
 dependencies {
     implementation project(':FtcRobotController')
+    implementation("dev.frozenmilk:Sinister:2.2.0")
     implementation("dev.frozenmilk.sinister:Sloth:0.2.4")
+    implementation("dev.frozenmilk.dairy:CachingHardware:1.0.0")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
 }

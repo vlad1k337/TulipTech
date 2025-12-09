@@ -6,9 +6,11 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
+import dev.frozenmilk.dairy.cachinghardware.CachingDcMotorEx;
+
 public class Intake {
     private final DcMotorEx intake;
-    public final DcMotorEx belt;
+    public  final DcMotorEx belt;
 
     // This is still here because we might have to adjust the belt speed
     // Intake belt could easily get ripped off mid-game due to physical factors

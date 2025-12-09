@@ -9,24 +9,20 @@ import com.qualcomm.robotcore.hardware.MotorControlAlgorithm;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
-public class Shooter {
+// Deprecated Shooter Subsystem
+public class ShooterFeedback {
     private final DcMotorEx motorRight;
     private final DcMotorEx motorLeft;
 
-    private boolean isStuck = false;
-
     private final Servo gate;
 
-    // This is the default shooting position for Auto.
-    // Robot is supposed to be in the middle of a White Line of bigger shooting area
-    public static final double midLineVelocity = 1250;
+    public static final double midLineVelocity = 1180;
     public static final double vertexVelocity  = 1450;
 
-    public Shooter(HardwareMap hardwareMap)
+    public ShooterFeedback(HardwareMap hardwareMap)
     {
         gate = hardwareMap.get(Servo.class, "Gate");
 
@@ -40,32 +36,27 @@ public class Shooter {
         configR.setAchieveableMaxRPMFraction(1.0);
         motorRight.setMotorType(configR);
         motorRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motorRight.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, coefficientsRight);
 
         MotorConfigurationType configL = motorLeft.getMotorType().clone();
         configL.setAchieveableMaxRPMFraction(1.0);
         motorLeft.setMotorType(configL);
         motorLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motorLeft.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, coefficientsLeft);
     }
 
     public void update(Gamepad gamepad, DcMotorEx belt)
     {
-        double averageCurrent = (motorLeft.getCurrent(CurrentUnit.MILLIAMPS) + motorRight.getCurrent(CurrentUnit.MILLIAMPS))/2;
-        ElapsedTime unstuckTimer = new ElapsedTime();
-        unstuckTimer.reset();
-        while(averageCurrent > 8000)
+        // Unstuck the ball
+        if(gamepad.rightStickButtonWasPressed())
         {
-            setVelocity(-2400);
+            setVelocity(-2300);
             belt.setPower(-1.0);
-
-            if(unstuckTimer.milliseconds() > 500)
-            {
-                setVelocity(0);
-                belt.setPower(0);
-
-                break;
-            }
+        } else if(gamepad.leftStickButtonWasPressed()) {
+            setVelocity(0);
+            belt.setPower(0);
         }
 
         if(gamepad.yWasPressed()) {
@@ -85,10 +76,10 @@ public class Shooter {
             setVelocity(motorRight.getVelocity() + 100);
         }
 
-        if(gamepad.right_trigger > 0.0)
+        if(gamepad.right_trigger > 0.2)
         {
             gateOpen();
-        } else if(gamepad.left_trigger > 0.0) {
+        } else if(gamepad.left_trigger > 0.2) {
             gateClose();
         }
     }
@@ -98,18 +89,12 @@ public class Shooter {
         telemetry.addData("Shooter Left Velocity", motorLeft.getVelocity());
         telemetry.addData("Shooter Right Velocity", motorRight.getVelocity());
         telemetry.addData("Right Shooter Current", motorRight.getCurrent(CurrentUnit.MILLIAMPS));
-        telemetry.addData("Left ShooterCurrent", motorLeft.getCurrent(CurrentUnit.MILLIAMPS));
-    }
-
-    public void setPower(double power)
-    {
-        motorRight.setPower(power);
-        motorLeft.setPower(-power);
+        telemetry.addData("Left Shooter Current", motorLeft.getCurrent(CurrentUnit.MILLIAMPS));
     }
 
     public void setVelocity(double velocity)
     {
-        motorRight.setVelocity(velocity);
+        motorRight.setVelocity(velocity + 37);
         motorLeft.setVelocity(-velocity);
     }
 
@@ -118,6 +103,6 @@ public class Shooter {
     }
 
     public void gateOpen() {
-        gate.setPosition(0.3);
+        gate.setPosition(0.25);
     }
 }

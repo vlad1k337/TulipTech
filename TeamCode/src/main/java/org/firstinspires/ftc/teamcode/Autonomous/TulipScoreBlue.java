@@ -11,7 +11,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.Paths.PathsBlue;
 import org.firstinspires.ftc.teamcode.Pedro.Constants;
 import org.firstinspires.ftc.teamcode.Subsystem.Intake;
-import org.firstinspires.ftc.teamcode.Subsystem.Shooter;
+import org.firstinspires.ftc.teamcode.Subsystem.ShooterFeedback;
+import org.firstinspires.ftc.teamcode.Subsystem.ShooterFeedforward;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +24,7 @@ public class TulipScoreBlue extends OpMode {
 
     private PathsBlue paths;
 
-    private Shooter shooter;
+    private ShooterFeedforward shooter;
     private Intake intake;
 
     private Follower follower;
@@ -51,9 +52,9 @@ public class TulipScoreBlue extends OpMode {
     final int timeToShootPGP = 4500;
     final int timeToShootGPP = 4500;
 
-    final int rpmTime3 = 1250;
-    final int rpmTimePPG = 1000;
-    final int rpmTimePGP = 750;
+    final int rpmTime3 = 1500;
+    final int rpmTimePPG = 1250;
+    final int rpmTimePGP = 1250;
     final int rpmTimeGPP = 500;
 
     @Override
@@ -70,7 +71,7 @@ public class TulipScoreBlue extends OpMode {
 
         paths = new PathsBlue(follower);
 
-        shooter = new Shooter(hardwareMap);
+        shooter = new ShooterFeedforward(hardwareMap);
         intake = new Intake(hardwareMap);
 
         shootingTimer = new ElapsedTime();
@@ -121,7 +122,7 @@ public class TulipScoreBlue extends OpMode {
     private void getReadyToShoot()
     {
         shooter.gateClose();
-        shooter.setVelocity(Shooter.midLineVelocity);
+        shooter.setVelocity(ShooterFeedback.midLineVelocity);
         shootingTimer.reset();
         RPMTimer.reset();
     }

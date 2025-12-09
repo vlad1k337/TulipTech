@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Autonomous;
 
 import com.pedropathing.follower.Follower;
+
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -10,7 +11,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.Paths.PathsRed;
 import org.firstinspires.ftc.teamcode.Pedro.Constants;
 import org.firstinspires.ftc.teamcode.Subsystem.Intake;
-import org.firstinspires.ftc.teamcode.Subsystem.Shooter;
+import org.firstinspires.ftc.teamcode.Subsystem.ShooterFeedback;
+import org.firstinspires.ftc.teamcode.Subsystem.ShooterFeedforward;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +24,7 @@ public class TulipScoreRed extends OpMode {
 
     private PathsRed paths;
 
-    private Shooter shooter;
+    private ShooterFeedforward shooter;
     private Intake intake;
 
     private Follower follower;
@@ -51,8 +53,8 @@ public class TulipScoreRed extends OpMode {
     final int timeToShootGPP = 4500;
 
     final int rpmTime3 = 1250;
-    final int rpmTimePPG = 1000;
-    final int rpmTimePGP = 750;
+    final int rpmTimePPG = 1250;
+    final int rpmTimePGP = 1250;
     final int rpmTimeGPP = 500;
 
     @Override
@@ -69,18 +71,17 @@ public class TulipScoreRed extends OpMode {
 
         paths = new PathsRed(follower);
 
-        shooter = new Shooter(hardwareMap);
+        shooter = new ShooterFeedforward(hardwareMap);
         intake = new Intake(hardwareMap);
 
         shootingTimer = new ElapsedTime();
         RPMTimer = new ElapsedTime();
-
-
     }
 
     @Override
     public void loop()
     {
+
         for (LynxModule hub : allHubs) {
             hub.clearBulkCache();
         }
@@ -101,6 +102,7 @@ public class TulipScoreRed extends OpMode {
         // FUCK THIS IF STATEMENT
         if(RPMTimer.milliseconds() > rpmTime)
         {
+            intake.stop();
             intake.setBeltSpeed(1.0);
             shooter.gateOpen();
         }
@@ -120,7 +122,7 @@ public class TulipScoreRed extends OpMode {
     private void getReadyToShoot()
     {
         shooter.gateClose();
-        shooter.setVelocity(Shooter.midLineVelocity);
+        shooter.setVelocity(ShooterFeedback.midLineVelocity);
         shootingTimer.reset();
         RPMTimer.reset();
     }
