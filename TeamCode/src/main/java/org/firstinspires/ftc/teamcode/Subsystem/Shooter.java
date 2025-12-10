@@ -14,24 +14,27 @@ import java.util.List;
 import dev.frozenmilk.dairy.cachinghardware.CachingDcMotorEx;
 import dev.frozenmilk.dairy.cachinghardware.CachingServo;
 
-public class ShooterFeedforward {
+public class Shooter {
     private final CachingDcMotorEx motorRight;
     private final CachingDcMotorEx motorLeft;
     private final CachingServo gate;
 
+    private final double MAX_VOLTAGE = 13.48;
     private final List<VoltageSensor> voltageSensor;
 
     // This is the default shooting position for Auto.
     // Robot is supposed to be in the middle of a White Line of bigger shooting area
     public static final double MID_LINE_VELOCITY = 1170;
 
+    private final double GATE_OPEN   = 0.5;
+    private final double GATE_CLOSED = 0.35;
+
     private double targetVelocity = 0;
 
     // kV = 1 / MAX_RPM, and adjusted for kS
-
     public double kSRight = 0.045, kSLeft = 0.031, kV = 0.00035, kP = 0.00075;
 
-    public ShooterFeedforward(HardwareMap hardwareMap)
+    public Shooter(HardwareMap hardwareMap)
     {
         motorRight = new CachingDcMotorEx(hardwareMap.get(DcMotorEx.class, "launchR"));
         motorLeft  = new CachingDcMotorEx(hardwareMap.get(DcMotorEx.class, "launchL"));
@@ -67,18 +70,18 @@ public class ShooterFeedforward {
             setVelocity(MID_LINE_VELOCITY);
         }
 
-        if(gamepad.right_trigger > 0.2)
-        {
-            gateOpen();
-        } else if(gamepad.left_trigger > 0.2) {
-            gateClose();
-        }
-
         if(gamepad.rightBumperWasPressed())
         {
             setVelocity(targetVelocity + 20);
         } else if(gamepad.leftBumperWasPressed()){
             setVelocity(targetVelocity - 20);
+        }
+
+        if(gamepad.right_trigger > 0.2)
+        {
+            gateOpen();
+        } else if(gamepad.left_trigger > 0.2) {
+            gateClose();
         }
     }
 
@@ -93,7 +96,7 @@ public class ShooterFeedforward {
             }
         }
 
-        double voltageCompenstation = minVoltage / 13.48;
+        double voltageCompenstation = minVoltage / MAX_VOLTAGE;
 
         motorLeft.setPower(-1*(((kV / voltageCompenstation) * targetVelocity) + (kP * (targetVelocity - motorRight.getVelocity())) + kSLeft));
         motorRight.setPower((((kV / voltageCompenstation) * targetVelocity) + (kP * (targetVelocity - motorRight.getVelocity())) + kSRight));
@@ -107,28 +110,16 @@ public class ShooterFeedforward {
         telemetry.addData("Shooter Right Target", targetVelocity);
     }
 
-
-    private void setPower(double power)
-    {
-        motorRight.setPower(power);
-        motorLeft.setPower(-power);
-    }
-
-    public double regressionVelocity(double distanceToGoal)
-    {
-        return 3.509 * distanceToGoal + 923.0;
-    }
-
     public void setVelocity(double target)
     {
         targetVelocity = target;
     }
 
     public void gateClose() {
-        gate.setPosition(0.35);
+        gate.setPosition(GATE_CLOSED);
     }
 
     public void gateOpen() {
-        gate.setPosition(0.5);
+        gate.setPosition(GATE_OPEN);
     }
 }

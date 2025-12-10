@@ -14,7 +14,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.Pedro.Constants;
 import org.firstinspires.ftc.teamcode.Subsystem.Intake;
-import org.firstinspires.ftc.teamcode.Subsystem.ShooterFeedforward;
+import org.firstinspires.ftc.teamcode.Subsystem.Shooter;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ import java.util.List;
 @TeleOp(name = "TulipRed2P")
 public class TulipRed2P extends OpMode {
     List<LynxModule> allHubs;
-    private ShooterFeedforward shooter;
+    private Shooter shooter;
     private Intake intake;
 
     private Follower follower;
@@ -45,7 +45,7 @@ public class TulipRed2P extends OpMode {
         follower.setStartingPose(startingPose);
         follower.update();
 
-        shooter = new ShooterFeedforward(hardwareMap);
+        shooter = new Shooter(hardwareMap);
         intake = new Intake(hardwareMap);
     }
 
@@ -55,6 +55,7 @@ public class TulipRed2P extends OpMode {
         follower.update();
     }
 
+    // sticks exponentiation
     private double expo(double input, double exponent) {
         return Math.pow(Math.abs(input), exponent) * Math.signum(input);
     }

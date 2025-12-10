@@ -5,12 +5,12 @@ import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Subsystem.ShooterFeedforward;
+import org.firstinspires.ftc.teamcode.Subsystem.Shooter;
 
 @TeleOp
 public class ShooterTuner extends OpMode {
     private TelemetryManager telemetryM;
-    private ShooterFeedforward shooter;
+    private Shooter shooter;
 
     // 0 for kS, 1 for kV, 2 for kP
     int chosenCoefficient = 0;
@@ -18,7 +18,7 @@ public class ShooterTuner extends OpMode {
     @Override
     public void init() {
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
-        shooter = new ShooterFeedforward(hardwareMap);
+        shooter = new Shooter(hardwareMap);
     }
 
     @Override

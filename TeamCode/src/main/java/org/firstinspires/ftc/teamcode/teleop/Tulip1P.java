@@ -11,12 +11,12 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.Pedro.Constants;
 import org.firstinspires.ftc.teamcode.Subsystem.Intake;
-import org.firstinspires.ftc.teamcode.Subsystem.ShooterFeedforward;
+import org.firstinspires.ftc.teamcode.Subsystem.Shooter;
 
 @Configurable
 @TeleOp(name = "Tulip1P")
 public class Tulip1P extends OpMode {
-    private ShooterFeedforward shooter;
+    private Shooter shooter;
     private Intake intake;
 
     private Follower follower;
@@ -32,7 +32,7 @@ public class Tulip1P extends OpMode {
         follower.setStartingPose(startingPose);
         follower.update();
 
-        shooter   = new ShooterFeedforward(hardwareMap);
+        shooter   = new Shooter(hardwareMap);
         intake    = new Intake(hardwareMap);
     }
 
