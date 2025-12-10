@@ -1,12 +1,9 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
-import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierPoint;
 import com.pedropathing.geometry.Pose;
-import com.pedropathing.paths.Path;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -18,7 +15,6 @@ import org.firstinspires.ftc.teamcode.Subsystem.Shooter;
 
 import java.util.List;
 
-@Configurable
 @TeleOp(name = "TulipRed2P")
 public class TulipRed2P extends OpMode {
     List<LynxModule> allHubs;
@@ -28,8 +24,6 @@ public class TulipRed2P extends OpMode {
     private Follower follower;
     private TelemetryManager telemetryM;
     private final Pose startingPose = new Pose(0, 0, Math.toRadians(0));
-
-    boolean automatedDrive = false;
 
     @Override
     public void init() {
@@ -55,33 +49,16 @@ public class TulipRed2P extends OpMode {
         follower.update();
     }
 
-    // sticks exponentiation
-    private double expo(double input, double exponent) {
-        return Math.pow(Math.abs(input), exponent) * Math.signum(input);
-    }
-
     private void updateDrive(Gamepad gamepad) {
-        if (!automatedDrive) {
-            follower.setTeleOpDrive(
-                    -gamepad.left_stick_y,
-                    -gamepad.left_stick_x,
-                    -gamepad.right_stick_x * 0.5,
-                    true
-            );
-        }
+        // slows down right stick, makes turning slower
+        double TURNING_MULTIPLIER = 0.5;
+        follower.setTeleOpDrive(
+                -gamepad.left_stick_y,
+                -gamepad.left_stick_x,
+                -gamepad.right_stick_x * TURNING_MULTIPLIER,
+                false
+        );
 
-        if (gamepad.left_trigger > 0.3 && !follower.isBusy()) {
-            follower.followPath(follower.pathBuilder()
-                    .addPath(new Path(new BezierPoint(follower.getPose())))
-                    .setLinearHeadingInterpolation(follower.getHeading(), Math.toRadians(180) + Math.atan2(144 - follower.getPose().getY(), 144 - follower.getPose().getX()))
-                    .build());
-            automatedDrive = true;
-        }
-
-        if (automatedDrive && !follower.isBusy()) {
-            follower.startTeleopDrive();
-            automatedDrive = false;
-        }
 
         follower.update();
     }

@@ -22,6 +22,15 @@ public class ShooterTuner extends OpMode {
     }
 
     @Override
+    public void start()
+    {
+        telemetryM.debug("This is shooter feedforward coefficients tuner");
+        telemetryM.debug("Press dpad right to cycle between kS, kV and kP");
+        telemetryM.debug("Use left/right bumpers to decrease/increase coefficients");
+        telemetryM.update(telemetry);
+    }
+
+    @Override
     public void loop() {
         shooter.update(gamepad1);
         shooter.updateTelemetry(telemetryM);

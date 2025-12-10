@@ -19,7 +19,6 @@ public class Shooter {
     private final CachingDcMotorEx motorLeft;
     private final CachingServo gate;
 
-    private final double MAX_VOLTAGE = 13.48;
     private final List<VoltageSensor> voltageSensor;
 
     // This is the default shooting position for Auto.
@@ -96,10 +95,11 @@ public class Shooter {
             }
         }
 
-        double voltageCompenstation = minVoltage / MAX_VOLTAGE;
+        double MAX_VOLTAGE = 13.48;
+        double voltageCompensation = minVoltage / MAX_VOLTAGE;
 
-        motorLeft.setPower(-1*(((kV / voltageCompenstation) * targetVelocity) + (kP * (targetVelocity - motorRight.getVelocity())) + kSLeft));
-        motorRight.setPower((((kV / voltageCompenstation) * targetVelocity) + (kP * (targetVelocity - motorRight.getVelocity())) + kSRight));
+        motorLeft.setPower(-1*(((kV / voltageCompensation) * targetVelocity) + (kP * (targetVelocity - motorRight.getVelocity())) + kSLeft));
+        motorRight.setPower((((kV / voltageCompensation) * targetVelocity) + (kP * (targetVelocity - motorRight.getVelocity())) + kSRight));
     }
 
     public void updateTelemetry(TelemetryManager telemetry)

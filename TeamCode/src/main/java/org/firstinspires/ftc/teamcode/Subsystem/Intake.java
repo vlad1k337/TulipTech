@@ -14,7 +14,7 @@ public class Intake {
 
     // This is still here because we might have to adjust the belt speed
     // Intake belt could easily get ripped off mid-game due to physical factors
-    public final double beltForwardPower = 1.0;
+    public final double BELT_POWER = 1.0;
 
     public Intake(HardwareMap hardwareMap)
     {
@@ -38,7 +38,7 @@ public class Intake {
     {
         if(gamepad1.aWasPressed() || gamepad2.aWasPressed())
         {
-            belt.setPower(beltForwardPower);
+            belt.setPower(BELT_POWER);
             intake.setPower(-1.0);
         }
 
@@ -51,13 +51,13 @@ public class Intake {
         // This should useful because intake + belt together take crap ton of voltage
         if(gamepad1.xWasPressed() || gamepad2.xWasPressed())
         {
-            belt.setPower(beltForwardPower);
+            belt.setPower(BELT_POWER);
         }
     }
 
     public void start()
     {
-        belt.setPower(beltForwardPower);
+        belt.setPower(BELT_POWER);
         intake.setPower(-1.0);
     }
 

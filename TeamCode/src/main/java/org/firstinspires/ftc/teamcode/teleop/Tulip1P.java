@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
-import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
@@ -13,7 +12,6 @@ import org.firstinspires.ftc.teamcode.Pedro.Constants;
 import org.firstinspires.ftc.teamcode.Subsystem.Intake;
 import org.firstinspires.ftc.teamcode.Subsystem.Shooter;
 
-@Configurable
 @TeleOp(name = "Tulip1P")
 public class Tulip1P extends OpMode {
     private Shooter shooter;
@@ -53,6 +51,7 @@ public class Tulip1P extends OpMode {
         follower.update();
     }
 
+    // Utility distance calculations, written for applying linear regression on shooting velocity.
     private double calculateDistance(double x1, double y1, double x2, double y2) {
         double xDifference = x2 - x1;
         double yDifference = y2 - y1;
