@@ -4,13 +4,16 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
-
+import java.util.List;
 import dev.frozenmilk.dairy.cachinghardware.CachingDcMotorEx;
 
 public class Intake {
+    private List<VoltageSensor> voltageSensor;
+
     private final CachingDcMotorEx intake;
-    public  final CachingDcMotorEx belt;
+    private final CachingDcMotorEx belt;
 
     // This is still here because we might have to adjust the belt speed
     // Intake belt could easily get ripped off mid-game due to physical factors
@@ -18,6 +21,8 @@ public class Intake {
 
     public Intake(HardwareMap hardwareMap)
     {
+        voltageSensor = hardwareMap.getAll(VoltageSensor.class);
+
         belt    = new CachingDcMotorEx(hardwareMap.get(DcMotorEx.class, "Belt"));
         intake  = new CachingDcMotorEx(hardwareMap.get(DcMotorEx.class, "Intake"));
 
@@ -38,13 +43,11 @@ public class Intake {
     {
         if(gamepad1.aWasPressed() || gamepad2.aWasPressed())
         {
-            belt.setPower(BELT_POWER);
-            intake.setPower(-1.0);
+            start();
         }
 
         if(gamepad1.bWasPressed() || gamepad2.bWasPressed()) {
-            belt.setPower(0.0);
-            intake.setPower(0.0);
+            stop();
         }
 
         // For the second driver to only activate the belt
@@ -57,7 +60,19 @@ public class Intake {
 
     public void start()
     {
-        belt.setPower(BELT_POWER);
+        // Find the minimal voltage across all voltage sensors
+        double minVoltage = Double.POSITIVE_INFINITY;
+        for (VoltageSensor sensor : voltageSensor) {
+            double sensorVoltage = sensor.getVoltage();
+            if (sensorVoltage > 0) {
+                minVoltage = Math.min(minVoltage, sensorVoltage);
+            }
+        }
+
+        double MAX_VOLTAGE = 13.68;
+        double voltageCompensation = minVoltage / MAX_VOLTAGE;
+
+        belt.setPower(BELT_POWER * voltageCompensation);
         intake.setPower(-1.0);
     }
 

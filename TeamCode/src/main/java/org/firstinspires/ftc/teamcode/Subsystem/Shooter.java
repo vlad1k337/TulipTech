@@ -23,7 +23,7 @@ public class Shooter {
 
     // This is the default shooting position for Auto.
     // Robot is supposed to be in the middle of a White Line of bigger shooting area
-    public static final double MID_LINE_VELOCITY = 1170;
+    public static final double MID_LINE_VELOCITY = 1200;
 
     private final double GATE_OPEN   = 0.5;
     private final double GATE_CLOSED = 0.35;
@@ -95,7 +95,7 @@ public class Shooter {
             }
         }
 
-        double MAX_VOLTAGE = 13.48;
+        double MAX_VOLTAGE = 14.00;
         double voltageCompensation = minVoltage / MAX_VOLTAGE;
 
         motorLeft.setPower(-1*(((kV / voltageCompensation) * targetVelocity) + (kP * (targetVelocity - motorRight.getVelocity())) + kSLeft));
