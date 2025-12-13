@@ -6,9 +6,6 @@
     import org.firstinspires.ftc.teamcode.Subsystem.Intake;
     import org.firstinspires.ftc.teamcode.Subsystem.Shooter;
 
-    import java.time.Instant;
-
-    import dev.nextftc.core.commands.Command;
     import dev.nextftc.core.commands.CommandManager;
     import dev.nextftc.core.commands.delays.Delay;
     import dev.nextftc.core.commands.groups.ParallelGroup;
@@ -18,15 +15,22 @@
     import dev.nextftc.extensions.pedro.PedroComponent;
     import dev.nextftc.ftc.NextFTCOpMode;
 
-    @Autonomous
+    @Autonomous(name = "CommandsRed")
     public class CommandsRed extends NextFTCOpMode {
+        // Pretty self-explanatory, mess around with this values if the robot takes too much time shooting
+        // Delay is always in seconds.
+        private static final double TIME_TO_SHOOT_PRELOAD = 4;
+        private static final double TIME_TO_SHOOT_PPG = 4;
+        private static final double TIME_TO_SHOOT_PGP = 4;
+        private static final double TIME_TO_SHOOT_GPP = 4;
+
         private PathsRed paths;
 
         private Shooter shooter;
         private Intake intake;
-
         private SequentialGroup autoCommands;
 
+        // Let NextFTC know about Pedro
         public CommandsRed()
         {
             addComponents(
@@ -60,36 +64,43 @@
             });
 
             InstantCommand startIntake = new InstantCommand(() -> {
-                // Just to be sure lmao
+                // Gate is always closed by stopShooter command.
+                // This is called just to be sure gate won't be open while intake is running.
                 shooter.gateClose();
                 intake.start();
             });
 
             return new SequentialGroup(
+                    // Score preloads
                     prepareShooters,
                     new FollowPath(paths.startToShoot).then(
-                            new Delay(0.5)
+                            // Delay to let shooters reach desired velocity
+                            new Delay(1.0)
                     ),
                     new ParallelGroup(
                             startShooter,
-                            new Delay(4)
+                            new Delay(TIME_TO_SHOOT_PRELOAD)
                     ),
                     stopShooter,
 
+                    // Intake and score PPG
                     new FollowPath(paths.moveToPPG).then(
                             startIntake
                     ),
                     new FollowPath(paths.moveToIntakePPG).then(
                             prepareShooters
                     ),
-                    new FollowPath((paths.shootPPG)),
-                    new Delay(0.75),
+                    new FollowPath((paths.shootPPG)).then(
+                            // Delay to let shooters reach desired velocity
+                            new Delay(0.75)
+                    ),
                     new ParallelGroup(
                             startShooter,
-                            new Delay(3)
+                            new Delay(TIME_TO_SHOOT_PPG)
                     ),
                     stopShooter,
 
+                    // Intake and score PGP
                     new FollowPath(paths.moveToPGP).then(
                             startIntake
                     ),
@@ -99,10 +110,11 @@
                     new FollowPath((paths.shootPGP)),
                     new ParallelGroup(
                             startShooter,
-                            new Delay(2.5)
+                            new Delay(TIME_TO_SHOOT_PGP)
                     ),
                     stopShooter,
 
+                    // Intake and score GPP
                     new FollowPath(paths.moveToGPP).then(
                             startIntake
                     ),
@@ -112,10 +124,11 @@
                     new FollowPath((paths.shootGPP)),
                     new ParallelGroup(
                             startShooter,
-                            new Delay(2.5)
+                            new Delay(TIME_TO_SHOOT_GPP)
                     ),
                     stopShooter,
 
+                    // Park
                     new FollowPath(paths.moveToPGP)
             );
         }

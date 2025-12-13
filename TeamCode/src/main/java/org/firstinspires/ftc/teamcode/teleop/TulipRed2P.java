@@ -50,13 +50,14 @@ public class TulipRed2P extends OpMode {
     }
 
     private void updateDrive(Gamepad gamepad) {
-        // slows down right stick, makes turning slower
+        // Slows down right stick, makes turning slower
+        // Increase if you want to turn faster
         double TURNING_MULTIPLIER = 0.5;
         follower.setTeleOpDrive(
                 -gamepad.left_stick_y,
                 -gamepad.left_stick_x,
                 -gamepad.right_stick_x * TURNING_MULTIPLIER,
-                false
+                true
         );
 
 
@@ -71,7 +72,7 @@ public class TulipRed2P extends OpMode {
 
     @Override
     public void loop() {
-        // pls make our loop times smaller
+        // Please make our loops faster
         for (LynxModule hub : allHubs) {
             hub.clearBulkCache();
         }

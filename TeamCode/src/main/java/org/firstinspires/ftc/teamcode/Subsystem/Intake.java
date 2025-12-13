@@ -39,6 +39,7 @@ public class Intake {
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
+    // Our first driver can also activate intake when needed.
     public void update(Gamepad gamepad1, Gamepad gamepad2)
     {
         if(gamepad1.aWasPressed() || gamepad2.aWasPressed())
@@ -50,11 +51,11 @@ public class Intake {
             stop();
         }
 
-        // For the second driver to only activate the belt
+        // Only activate the belt
         // This should useful because intake + belt together take crap ton of voltage
         if(gamepad1.xWasPressed() || gamepad2.xWasPressed())
         {
-            belt.setPower(BELT_POWER);
+            setBeltSpeed(BELT_POWER);
         }
     }
 
@@ -69,9 +70,11 @@ public class Intake {
             }
         }
 
-        double MAX_VOLTAGE = 13.68;
+        double MAX_VOLTAGE = 14.00;
         double voltageCompensation = minVoltage / MAX_VOLTAGE;
 
+        // Divide intake power based on current voltage
+        // This should keep our Shooter more consistent, since the intake won't take full power.
         belt.setPower(BELT_POWER * voltageCompensation);
         intake.setPower(-1.0);
     }

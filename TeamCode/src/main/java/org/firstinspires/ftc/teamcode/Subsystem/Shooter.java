@@ -21,8 +21,8 @@ public class Shooter {
 
     private final List<VoltageSensor> voltageSensor;
 
-    // This is the default shooting position for Auto.
-    // Robot is supposed to be in the middle of a White Line of bigger shooting area
+    // Velocity required to shoot from the middle of a white line.
+    // Decrease it if robot is overshooting, increase if it's undershooting..
     public static final double MID_LINE_VELOCITY = 1200;
 
     private final double GATE_OPEN   = 0.5;
