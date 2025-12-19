@@ -75,8 +75,8 @@ public class Intake {
 
         // Divide intake power based on current voltage
         // This should keep our Shooter more consistent, since the intake won't take full power.
-        belt.setPower(BELT_POWER * voltageCompensation);
-        intake.setPower(-1.0);
+        belt.setPower(BELT_POWER);
+        intake.setPower(-1.0 * voltageCompensation);
     }
 
     public void stop()
