@@ -19,27 +19,24 @@ public class Shooter {
     private final CachingDcMotorEx motorLeft;
     private final CachingServo gate;
 
-    private final List<VoltageSensor> voltageSensor;
-
     // Velocity required to shoot from the middle of a white line.
     // Decrease it if robot is overshooting, increase if it's undershooting..
-    public static final double MID_LINE_VELOCITY = 1200;
+    public static final double MID_LINE_VELOCITY = 1320;
 
-    private final double GATE_OPEN   = 0.5;
-    private final double GATE_CLOSED = 0.35;
+    private final double GATE_OPEN   = 0.0;
+    private final double GATE_CLOSED = 0.6;
 
     private double targetVelocity = 0;
 
     // kV = 1 / MAX_RPM, and adjusted for kS
-    public double kSRight = 0.045, kSLeft = 0.031, kV = 0.00035, kP = 0.00075;
+    public double kSRight = 0.041, kSLeft = 0.031, kV = 0.00035, kP = 0.001;
 
     public Shooter(HardwareMap hardwareMap)
     {
         motorRight = new CachingDcMotorEx(hardwareMap.get(DcMotorEx.class, "launchR"));
         motorLeft  = new CachingDcMotorEx(hardwareMap.get(DcMotorEx.class, "launchL"));
         gate       = new CachingServo(hardwareMap.get(Servo.class, "Gate"));
-
-        voltageSensor = hardwareMap.getAll(VoltageSensor.class);
+        gate.setDirection(Servo.Direction.REVERSE);
 
         MotorConfigurationType configR = motorRight.getMotorType().clone();
         configR.setAchieveableMaxRPMFraction(1.0);
@@ -86,20 +83,8 @@ public class Shooter {
 
     public void updateFeedforward()
     {
-        // Find the minimal voltage across all voltage sensors
-        double minVoltage = Double.POSITIVE_INFINITY;
-        for (VoltageSensor sensor : voltageSensor) {
-            double sensorVoltage = sensor.getVoltage();
-            if (sensorVoltage > 0) {
-                minVoltage = Math.min(minVoltage, sensorVoltage);
-            }
-        }
-
-        double MAX_VOLTAGE = 14.00;
-        double voltageCompensation = minVoltage / MAX_VOLTAGE;
-
-        motorLeft.setPower(-1*(((kV / voltageCompensation) * targetVelocity) + (kP * (targetVelocity - motorRight.getVelocity())) + kSLeft));
-        motorRight.setPower((((kV / voltageCompensation) * targetVelocity) + (kP * (targetVelocity - motorRight.getVelocity())) + kSRight));
+        motorLeft.setPower(-1*((kV * targetVelocity) + (kP * (targetVelocity + motorLeft.getVelocity())) + kSLeft));
+        motorRight.setPower((kV * targetVelocity) + (kP * (targetVelocity - motorRight.getVelocity())) + kSRight);
     }
 
     public void updateTelemetry(TelemetryManager telemetry)

@@ -47,7 +47,7 @@ public class Tulip1P extends OpMode {
                 -gamepad.left_stick_y,
                 -gamepad.left_stick_x,
                 -gamepad.right_stick_x,
-                    false);
+                    true);
 
         follower.update();
     }

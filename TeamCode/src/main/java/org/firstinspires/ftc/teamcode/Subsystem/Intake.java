@@ -10,8 +10,6 @@ import java.util.List;
 import dev.frozenmilk.dairy.cachinghardware.CachingDcMotorEx;
 
 public class Intake {
-    private List<VoltageSensor> voltageSensor;
-
     private final CachingDcMotorEx intake;
     private final CachingDcMotorEx belt;
 
@@ -21,8 +19,6 @@ public class Intake {
 
     public Intake(HardwareMap hardwareMap)
     {
-        voltageSensor = hardwareMap.getAll(VoltageSensor.class);
-
         belt    = new CachingDcMotorEx(hardwareMap.get(DcMotorEx.class, "Belt"));
         intake  = new CachingDcMotorEx(hardwareMap.get(DcMotorEx.class, "Intake"));
 
@@ -61,22 +57,8 @@ public class Intake {
 
     public void start()
     {
-        // Find the minimal voltage across all voltage sensors
-        double minVoltage = Double.POSITIVE_INFINITY;
-        for (VoltageSensor sensor : voltageSensor) {
-            double sensorVoltage = sensor.getVoltage();
-            if (sensorVoltage > 0) {
-                minVoltage = Math.min(minVoltage, sensorVoltage);
-            }
-        }
-
-        double MAX_VOLTAGE = 14.00;
-        double voltageCompensation = minVoltage / MAX_VOLTAGE;
-
-        // Divide intake power based on current voltage
-        // This should keep our Shooter more consistent, since the intake won't take full power.
         belt.setPower(BELT_POWER);
-        intake.setPower(-1.0 * voltageCompensation);
+        intake.setPower(-1.0);
     }
 
     public void stop()

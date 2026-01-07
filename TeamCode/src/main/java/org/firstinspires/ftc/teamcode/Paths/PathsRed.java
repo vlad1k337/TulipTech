@@ -8,7 +8,7 @@ import com.pedropathing.paths.PathChain;
 
 public class PathsRed {
     public static final Pose startPose = new Pose(124, 121, Math.toRadians(270));
-    final Pose shootingPose = new Pose(101, 102, Math.toRadians(229));
+    final Pose shootingPose = new Pose(101, 101, Math.toRadians(228));
 
     final Pose PPG = new Pose(89, 83, Math.toRadians(0));
     final Pose PGP = new Pose(89, 59, Math.toRadians(0));
@@ -27,12 +27,12 @@ public class PathsRed {
     {
         startToShoot = follower.pathBuilder()
                 .addPath(new BezierLine(startPose, shootingPose))
-                .setLinearHeadingInterpolation(startPose.getHeading(), shootingPose.getHeading())
+                .setLinearHeadingInterpolation(startPose.getHeading(), shootingPose.getHeading(), 0.8)
                 .build();
 
         moveToPPG = follower.pathBuilder()
                 .addPath(new BezierLine(shootingPose, PPG))
-                .setLinearHeadingInterpolation(shootingPose.getHeading(), PPG.getHeading())
+                .setLinearHeadingInterpolation(shootingPose.getHeading(), PPG.getHeading(), 0.8)
                 .build();
 
         moveToIntakePPG = follower.pathBuilder()
@@ -43,7 +43,7 @@ public class PathsRed {
 
         shootPPG = follower.pathBuilder()
                 .addPath(new BezierLine(IntakePPG, shootingPose))
-                .setLinearHeadingInterpolation(IntakePPG.getHeading(), shootingPose.getHeading())
+                .setLinearHeadingInterpolation(IntakePPG.getHeading(), shootingPose.getHeading(), 0.8)
                 .build();
 
         moveToPGP = follower.pathBuilder()
@@ -53,13 +53,13 @@ public class PathsRed {
 
         moveToIntakePGP = follower.pathBuilder()
                 .addPath(new BezierLine(PGP, IntakePGP))
-                .setLinearHeadingInterpolation(PGP.getHeading(), IntakePGP.getHeading())
+                .setTangentHeadingInterpolation()
                 .setNoDeceleration()
                 .build();
 
         shootPGP = follower.pathBuilder()
                 .addPath(new BezierCurve(IntakePGP, GPP, shootingPose))
-                .setLinearHeadingInterpolation(IntakePGP.getHeading(), shootingPose.getHeading())
+                .setLinearHeadingInterpolation(IntakePGP.getHeading(), shootingPose.getHeading(), 0.8)
                 .build();
 
         moveToGPP = follower.pathBuilder()
@@ -69,13 +69,13 @@ public class PathsRed {
 
         moveToIntakeGPP = follower.pathBuilder()
                 .addPath(new BezierLine(GPP, IntakeGPP))
-                .setLinearHeadingInterpolation(GPP.getHeading(), IntakeGPP.getHeading())
+                .setTangentHeadingInterpolation()
                 .setNoDeceleration()
                 .build();
 
         shootGPP = follower.pathBuilder()
                 .addPath(new BezierLine(IntakeGPP, shootingPose))
-                .setLinearHeadingInterpolation(IntakeGPP.getHeading(), shootingPose.getHeading())
+                .setLinearHeadingInterpolation(IntakeGPP.getHeading(), shootingPose.getHeading(), 0.8)
                 .build();
     }
 }

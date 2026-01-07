@@ -19,10 +19,10 @@
     public class CommandsRed extends NextFTCOpMode {
         // Pretty self-explanatory, mess around with this values if the robot takes too much time shooting
         // Delay is always in seconds.
-        private static final double TIME_TO_SHOOT_PRELOAD = 4;
-        private static final double TIME_TO_SHOOT_PPG = 4;
-        private static final double TIME_TO_SHOOT_PGP = 4;
-        private static final double TIME_TO_SHOOT_GPP = 4;
+        private static final double TIME_TO_SHOOT_PRELOAD = 2.5;
+        private static final double TIME_TO_SHOOT_PPG = 2.5;
+        private static final double TIME_TO_SHOOT_PGP = 2.5;
+        private static final double TIME_TO_SHOOT_GPP = 2.5;
 
         private PathsRed paths;
 
@@ -75,7 +75,7 @@
                     prepareShooters,
                     new FollowPath(paths.startToShoot).then(
                             // Delay to let shooters reach desired velocity
-                            new Delay(1.0)
+                            new Delay(0.5)
                     ),
                     new ParallelGroup(
                             startShooter,
@@ -90,9 +90,9 @@
                     new FollowPath(paths.moveToIntakePPG).then(
                             prepareShooters
                     ),
+
                     new FollowPath((paths.shootPPG)).then(
-                            // Delay to let shooters reach desired velocity
-                            new Delay(0.75)
+                            new Delay(0.3)
                     ),
                     new ParallelGroup(
                             startShooter,
@@ -107,7 +107,9 @@
                     new FollowPath(paths.moveToIntakePGP).then(
                             prepareShooters
                     ),
-                    new FollowPath((paths.shootPGP)),
+                    new FollowPath((paths.shootPGP)).then(
+                            new Delay(0.3)
+                    ),
                     new ParallelGroup(
                             startShooter,
                             new Delay(TIME_TO_SHOOT_PGP)
@@ -121,7 +123,9 @@
                     new FollowPath(paths.moveToIntakeGPP).then(
                             prepareShooters
                     ),
-                    new FollowPath((paths.shootGPP)),
+                    new FollowPath((paths.shootGPP)).then(
+                            new Delay(0.2)
+                    ),
                     new ParallelGroup(
                             startShooter,
                             new Delay(TIME_TO_SHOOT_GPP)

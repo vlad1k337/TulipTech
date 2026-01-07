@@ -20,10 +20,10 @@ import dev.nextftc.ftc.NextFTCOpMode;
 public class CommandsBlue extends NextFTCOpMode {
     // Pretty self-explanatory, mess around with this values if the robot takes too much time shooting
     // Delay is always in seconds.
-    private static final double TIME_TO_SHOOT_PRELOAD = 4;
-    private static final double TIME_TO_SHOOT_PPG = 4;
-    private static final double TIME_TO_SHOOT_PGP = 4;
-    private static final double TIME_TO_SHOOT_GPP = 4;
+    private static final double TIME_TO_SHOOT_PRELOAD = 3;
+    private static final double TIME_TO_SHOOT_PPG = 3;
+    private static final double TIME_TO_SHOOT_PGP = 3;
+    private static final double TIME_TO_SHOOT_GPP = 3;
 
     private PathsBlue paths;
 
@@ -88,7 +88,7 @@ public class CommandsBlue extends NextFTCOpMode {
                 new FollowPath(paths.moveToPPG).then(
                         startIntake
                 ),
-                new FollowPath(paths.moveToIntakePPG).then(
+                new FollowPath(paths.moveToIntakePPG, true, 0.5).then(
                         prepareShooters
                 ),
                 new FollowPath((paths.shootPPG)).then(
@@ -105,7 +105,7 @@ public class CommandsBlue extends NextFTCOpMode {
                 new FollowPath(paths.moveToPGP).then(
                         startIntake
                 ),
-                new FollowPath(paths.moveToIntakePGP).then(
+                new FollowPath(paths.moveToIntakePGP, true, 0.5).then(
                         prepareShooters
                 ),
                 new FollowPath((paths.shootPGP)),
@@ -119,7 +119,7 @@ public class CommandsBlue extends NextFTCOpMode {
                 new FollowPath(paths.moveToGPP).then(
                         startIntake
                 ),
-                new FollowPath(paths.moveToIntakeGPP).then(
+                new FollowPath(paths.moveToIntakeGPP, true, 0.5).then(
                         prepareShooters
                 ),
                 new FollowPath((paths.shootGPP)),

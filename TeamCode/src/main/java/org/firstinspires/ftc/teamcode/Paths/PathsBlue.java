@@ -8,13 +8,13 @@ import com.pedropathing.paths.PathChain;
 
 public class PathsBlue {
     public static final Pose startPose = new Pose(20, 121, Math.toRadians(270));
-    final Pose shootingPose = new Pose(43, 100, Math.toRadians(313));
+    final Pose shootingPose = new Pose(43, 100, Math.toRadians(312));
 
     final Pose PPG = new Pose(89, 83, Math.toRadians(0)).mirror();
     final Pose PGP = new Pose(89, 59, Math.toRadians(0)).mirror();
     final Pose GPP = new Pose(89, 36, Math.toRadians(0)).mirror();
 
-    final Pose IntakePPG = new Pose(120, 83, Math.toRadians(0)).mirror();
+    final Pose IntakePPG = new Pose(125, 83, Math.toRadians(0)).mirror();
     final Pose IntakePGP = new Pose(125, 59, Math.toRadians(0)).mirror();
     final Pose IntakeGPP = new Pose(125, 36, Math.toRadians(0)).mirror();
 
