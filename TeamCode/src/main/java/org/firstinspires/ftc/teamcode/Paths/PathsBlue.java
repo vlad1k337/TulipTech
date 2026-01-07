@@ -14,7 +14,7 @@ public class PathsBlue {
     final Pose PGP = new Pose(89, 59, Math.toRadians(0)).mirror();
     final Pose GPP = new Pose(89, 36, Math.toRadians(0)).mirror();
 
-    final Pose IntakePPG = new Pose(125, 83, Math.toRadians(0)).mirror();
+    final Pose IntakePPG = new Pose(120, 83, Math.toRadians(0)).mirror();
     final Pose IntakePGP = new Pose(125, 59, Math.toRadians(0)).mirror();
     final Pose IntakeGPP = new Pose(125, 36, Math.toRadians(0)).mirror();
 

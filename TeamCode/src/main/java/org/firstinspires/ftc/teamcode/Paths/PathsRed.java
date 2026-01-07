@@ -27,12 +27,12 @@ public class PathsRed {
     {
         startToShoot = follower.pathBuilder()
                 .addPath(new BezierLine(startPose, shootingPose))
-                .setLinearHeadingInterpolation(startPose.getHeading(), shootingPose.getHeading(), 0.8)
+                .setLinearHeadingInterpolation(startPose.getHeading(), shootingPose.getHeading())
                 .build();
 
         moveToPPG = follower.pathBuilder()
                 .addPath(new BezierLine(shootingPose, PPG))
-                .setLinearHeadingInterpolation(shootingPose.getHeading(), PPG.getHeading(), 0.8)
+                .setLinearHeadingInterpolation(shootingPose.getHeading(), PPG.getHeading())
                 .build();
 
         moveToIntakePPG = follower.pathBuilder()
@@ -43,7 +43,7 @@ public class PathsRed {
 
         shootPPG = follower.pathBuilder()
                 .addPath(new BezierLine(IntakePPG, shootingPose))
-                .setLinearHeadingInterpolation(IntakePPG.getHeading(), shootingPose.getHeading(), 0.8)
+                .setLinearHeadingInterpolation(IntakePPG.getHeading(), shootingPose.getHeading())
                 .build();
 
         moveToPGP = follower.pathBuilder()
@@ -59,7 +59,7 @@ public class PathsRed {
 
         shootPGP = follower.pathBuilder()
                 .addPath(new BezierCurve(IntakePGP, GPP, shootingPose))
-                .setLinearHeadingInterpolation(IntakePGP.getHeading(), shootingPose.getHeading(), 0.8)
+                .setLinearHeadingInterpolation(IntakePGP.getHeading(), shootingPose.getHeading())
                 .build();
 
         moveToGPP = follower.pathBuilder()
@@ -75,7 +75,7 @@ public class PathsRed {
 
         shootGPP = follower.pathBuilder()
                 .addPath(new BezierLine(IntakeGPP, shootingPose))
-                .setLinearHeadingInterpolation(IntakeGPP.getHeading(), shootingPose.getHeading(), 0.8)
+                .setLinearHeadingInterpolation(IntakeGPP.getHeading(), shootingPose.getHeading())
                 .build();
     }
 }

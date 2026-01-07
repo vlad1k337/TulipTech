@@ -2,8 +2,10 @@ package org.firstinspires.ftc.teamcode.teleop;
 
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
+import com.pedropathing.control.PIDFController;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.math.MathFunctions;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -21,7 +23,10 @@ public class Tulip1P extends OpMode {
     private Follower follower;
     private TelemetryManager telemetryM;
 
+    private PIDFController headingController;
     private final Pose startingPose = new Pose(72, 72, 0);
+    private double targetHeading;
+    private boolean headingLock = false;
 
     @Override
     public void init() {
@@ -30,6 +35,8 @@ public class Tulip1P extends OpMode {
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startingPose);
         follower.update();
+
+        headingController = new PIDFController(follower.constants.coefficientsHeadingPIDF);
 
         shooter   = new Shooter(hardwareMap);
         intake    = new Intake(hardwareMap);
@@ -41,13 +48,29 @@ public class Tulip1P extends OpMode {
         follower.update();
     }
 
+    private double expo(double input)
+    {
+        return Math.signum(input) * Math.pow(Math.abs(input), 1.4);
+    }
+
+    private double getHeadingError()
+    {
+        double headingError = MathFunctions.getTurnDirection(follower.getPose().getHeading(), targetHeading)
+                * MathFunctions.getSmallestAngleDifference(follower.getPose().getHeading(), targetHeading);
+
+        return headingError;
+    }
+
     private void updateDrive(Gamepad gamepad)
     {
+        headingController.setCoefficients(follower.constants.coefficientsHeadingPIDF);
+        headingController.updateError(getHeadingError());
+
         follower.setTeleOpDrive(
-                -gamepad.left_stick_y,
-                -gamepad.left_stick_x,
+                expo(-gamepad.left_stick_y),
+                expo(-gamepad.left_stick_x),
                 -gamepad.right_stick_x,
-                    true);
+                true);
 
         follower.update();
     }

@@ -92,7 +92,7 @@
                     ),
 
                     new FollowPath((paths.shootPPG)).then(
-                            new Delay(0.3)
+                            new Delay(0.5)
                     ),
                     new ParallelGroup(
                             startShooter,
@@ -108,7 +108,7 @@
                             prepareShooters
                     ),
                     new FollowPath((paths.shootPGP)).then(
-                            new Delay(0.3)
+                            new Delay(0.5)
                     ),
                     new ParallelGroup(
                             startShooter,
@@ -124,7 +124,7 @@
                             prepareShooters
                     ),
                     new FollowPath((paths.shootGPP)).then(
-                            new Delay(0.2)
+                            new Delay(0.5)
                     ),
                     new ParallelGroup(
                             startShooter,

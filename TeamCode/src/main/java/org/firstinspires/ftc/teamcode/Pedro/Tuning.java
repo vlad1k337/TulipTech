@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.Pedro;
 
 import static org.firstinspires.ftc.teamcode.Pedro.Tuning.changes;
-import static org.firstinspires.ftc.teamcode.Pedro.Tuning.drawOnlyCurrent;
 import static org.firstinspires.ftc.teamcode.Pedro.Tuning.draw;
+import static org.firstinspires.ftc.teamcode.Pedro.Tuning.drawOnlyCurrent;
 import static org.firstinspires.ftc.teamcode.Pedro.Tuning.follower;
 import static org.firstinspires.ftc.teamcode.Pedro.Tuning.stopRobot;
 import static org.firstinspires.ftc.teamcode.Pedro.Tuning.telemetryM;
@@ -16,11 +16,15 @@ import com.bylazar.field.Style;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.*;
-import com.pedropathing.math.*;
-import com.pedropathing.paths.*;
+import com.pedropathing.geometry.BezierCurve;
+import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.math.Vector;
+import com.pedropathing.paths.HeadingInterpolator;
+import com.pedropathing.paths.Path;
+import com.pedropathing.paths.PathChain;
 import com.pedropathing.telemetry.SelectableOpMode;
-import com.pedropathing.util.*;
+import com.pedropathing.util.PoseHistory;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -206,7 +210,7 @@ class ForwardTuner extends OpMode {
     public void loop() {
         follower.update();
 
-        telemetryM.debug("Distance Moved: " + follower.getPose().getX());
+        telemetryM.debug("Distance Moved: " + (follower.getPose().getX() - 72));
         telemetryM.debug("The multiplier will display what your forward ticks to inches should be to scale your current distance to " + DISTANCE + " inches.");
         telemetryM.debug("Multiplier: " + (DISTANCE / ((follower.getPose().getX() - 72) / follower.getPoseTracker().getLocalizer().getForwardMultiplier())));
         telemetryM.update(telemetry);
@@ -254,7 +258,7 @@ class LateralTuner extends OpMode {
     public void loop() {
         follower.update();
 
-        telemetryM.debug("Distance Moved: " + follower.getPose().getY());
+        telemetryM.debug("Distance Moved: " + (follower.getPose().getY() - 72));
         telemetryM.debug("The multiplier will display what your strafe ticks to inches should be to scale your current distance to " + DISTANCE + " inches.");
         telemetryM.debug("Multiplier: " + (DISTANCE / ((follower.getPose().getY() - 72) / follower.getPoseTracker().getLocalizer().getLateralMultiplier())));
         telemetryM.update(telemetry);
@@ -1012,8 +1016,6 @@ class Line extends OpMode {
         }
 
         telemetryM.debug("Driving Forward?: " + forward);
-        telemetryM.addData("Zero Line", 0);
-        telemetryM.addData("Error", follower.errorCalculator.getDriveErrors()[1]);
         telemetryM.update(telemetry);
     }
 }

@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.Paths.PathsBlue;
+import org.firstinspires.ftc.teamcode.Paths.PathsRed;
 import org.firstinspires.ftc.teamcode.Pedro.Constants;
 import org.firstinspires.ftc.teamcode.Subsystem.Intake;
 import org.firstinspires.ftc.teamcode.Subsystem.Shooter;
@@ -20,10 +21,10 @@ import dev.nextftc.ftc.NextFTCOpMode;
 public class CommandsBlue extends NextFTCOpMode {
     // Pretty self-explanatory, mess around with this values if the robot takes too much time shooting
     // Delay is always in seconds.
-    private static final double TIME_TO_SHOOT_PRELOAD = 3;
-    private static final double TIME_TO_SHOOT_PPG = 3;
-    private static final double TIME_TO_SHOOT_PGP = 3;
-    private static final double TIME_TO_SHOOT_GPP = 3;
+    private static final double TIME_TO_SHOOT_PRELOAD = 2.5;
+    private static final double TIME_TO_SHOOT_PPG = 2.5;
+    private static final double TIME_TO_SHOOT_PGP = 2.5;
+    private static final double TIME_TO_SHOOT_GPP = 2.5;
 
     private PathsBlue paths;
 
@@ -76,7 +77,7 @@ public class CommandsBlue extends NextFTCOpMode {
                 prepareShooters,
                 new FollowPath(paths.startToShoot).then(
                         // Delay to let shooters reach desired velocity
-                        new Delay(1.0)
+                        new Delay(0.5)
                 ),
                 new ParallelGroup(
                         startShooter,
@@ -88,12 +89,12 @@ public class CommandsBlue extends NextFTCOpMode {
                 new FollowPath(paths.moveToPPG).then(
                         startIntake
                 ),
-                new FollowPath(paths.moveToIntakePPG, true, 0.5).then(
+                new FollowPath(paths.moveToIntakePPG).then(
                         prepareShooters
                 ),
+
                 new FollowPath((paths.shootPPG)).then(
-                        // Delay to let shooters reach desired velocity
-                        new Delay(0.75)
+                        new Delay(0.5)
                 ),
                 new ParallelGroup(
                         startShooter,
@@ -105,10 +106,12 @@ public class CommandsBlue extends NextFTCOpMode {
                 new FollowPath(paths.moveToPGP).then(
                         startIntake
                 ),
-                new FollowPath(paths.moveToIntakePGP, true, 0.5).then(
+                new FollowPath(paths.moveToIntakePGP).then(
                         prepareShooters
                 ),
-                new FollowPath((paths.shootPGP)),
+                new FollowPath((paths.shootPGP)).then(
+                        new Delay(0.5)
+                ),
                 new ParallelGroup(
                         startShooter,
                         new Delay(TIME_TO_SHOOT_PGP)
@@ -119,10 +122,12 @@ public class CommandsBlue extends NextFTCOpMode {
                 new FollowPath(paths.moveToGPP).then(
                         startIntake
                 ),
-                new FollowPath(paths.moveToIntakeGPP, true, 0.5).then(
+                new FollowPath(paths.moveToIntakeGPP).then(
                         prepareShooters
                 ),
-                new FollowPath((paths.shootGPP)),
+                new FollowPath((paths.shootGPP)).then(
+                        new Delay(0.5)
+                ),
                 new ParallelGroup(
                         startShooter,
                         new Delay(TIME_TO_SHOOT_GPP)

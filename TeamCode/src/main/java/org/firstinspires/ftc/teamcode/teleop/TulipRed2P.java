@@ -25,9 +25,9 @@ public class TulipRed2P extends OpMode {
 
     private Follower follower;
     private TelemetryManager telemetryM;
-    private final Pose startingPose = new Pose(0, 0, Math.toRadians(0));
+    private final Pose startingPose = new Pose(89, 59, Math.toRadians(0));
 
-    private final double targetHeading = Math.toRadians(228);
+    private double targetHeading = Math.toRadians(228);
     private PIDFController headingController;
     private boolean headingLock = false;
 
@@ -64,6 +64,8 @@ public class TulipRed2P extends OpMode {
             return 0;
         }
 
+        //targetHeading = Math.atan2(135 - follower.getPose().getY(), 135 - follower.getPose().getX()) - Math.toRadians(180);
+
         double headingError = MathFunctions.getTurnDirection(follower.getPose().getHeading(), targetHeading)
                 * MathFunctions.getSmallestAngleDifference(follower.getPose().getHeading(), targetHeading);
 
@@ -84,13 +86,15 @@ public class TulipRed2P extends OpMode {
             follower.setTeleOpDrive(
                     -gamepad.left_stick_y,
                     -gamepad.left_stick_x,
-                    headingController.run()
+                    headingController.run(),
+                    false
             );
         } else {
             follower.setTeleOpDrive(
                     -gamepad.left_stick_y,
                     -gamepad.left_stick_x,
-                    -gamepad.right_stick_x
+                    -gamepad.right_stick_x,
+                    false
             );
         }
 
